@@ -1,0 +1,29 @@
+{
+  "name": "smarthome_backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dungnq4256/smarthome_backend.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dungnq4256/smarthome_backend/issues"
+  },
+  "homepage": "https://github.com/dungnq4256/smarthome_backend#readme",
+  "dependencies": {
+    "autocannon": "^7.9.0",
+    "body-parser": "^1.20.0",
+    "cors": "^2.8.5",
+    "express": "^4.18.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.3.5",
+    "mqtt": "^4.3.7",
+    "nodemon": "^2.0.16"
+  }
+}
