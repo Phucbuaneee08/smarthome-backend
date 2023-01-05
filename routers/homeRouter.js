@@ -21,10 +21,10 @@ router.get('/api/home/detail', homeController.getHomeData);
 router.get('/api/home/find', homeController.getOtherHomesList);
 
 //request to join home
-router.put('/api/home/request-to-join-home', homeController.requestToJoinHome);
+router.post('/api/home/request-to-join-home', homeController.requestToJoinHome);
 
 //confirm join home
-router.put('/api/home/confirm-join-home', homeController.confirmJoinHome);
+router.post('/api/home/confirm-join-home', homeController.confirmJoinHome);
 
 //refuse join home
 router.delete('/api/home/refuse-join-home', homeController.refuseJoinHome);
