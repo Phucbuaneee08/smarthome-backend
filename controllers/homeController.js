@@ -110,6 +110,55 @@ const homeController = {
         }
     },
 
+    deleteHome: async (req, res) => {
+        try {
+            const accessToken = req.headers.authorization.split(" ")[1];
+
+            // Đầu vào: Id của căn nhà
+            const { homeId } = req.body;
+            const account = await Account.findOne({
+                accessToken: accessToken,
+            });
+            if (!account) {
+                return res.send({
+                    result: "failed",
+                    message: "Không có quyền truy cập",
+                });
+            }
+
+            // Lấy thông tin nhà bị xóa
+            const home = await Home.findById({
+                _id: homeId,
+            });
+
+            // Xóa thông tin nhà khỏi homeList của các tài khoản liên quan
+            home.accountList.map(
+                async (item) =>
+                    await Account.updateOne(
+                        { _id: item._id },
+                        {
+                            $pull: {
+                                homeList: { _id: homeId },
+                            },
+                        }
+                    )
+            );
+
+            // Xóa nhà khỏi database
+            await Home.findByIdAndDelete(homeId);
+
+            //Thông báo thành công
+            return res.send({
+                result: "success",
+            });
+        } catch (error) {
+            res.send({
+                result: "failed",
+                message: error,
+            });
+        }
+    },
+
     getOtherHomesList: async (req, res) => {
         try {
             const accessToken = req.headers.authorization.split(" ")[1];
@@ -171,6 +220,55 @@ const homeController = {
             return res.send({
                 result: "success",
                 homeData: homeData,
+            });
+        } catch (error) {
+            res.send({
+                result: "failed",
+                message: error,
+            });
+        }
+    },
+
+    updateHomeData: async (req, res) => {
+        try {
+            const accessToken = req.headers.authorization.split(" ")[1];
+
+            // Đầu vào: Dữ liệu mới của nhà (name, address)
+            const { homeId, newName, newAddress } = req.body;
+            const account = await Account.findOne({
+                accessToken: accessToken,
+            });
+            if (!account) {
+                return res.send({
+                    result: "failed",
+                    message: "Không có quyền truy cập",
+                });
+            }
+            // Cập nhật thông tin mới
+            const newHomeData = await Home.findByIdAndUpdate(homeId, {
+                name: newName,
+                address: newAddress,
+            });
+
+            // Sửa thông tin nhà ở homeList của các tài khoản liên quan
+            newHomeData.accountList.map(
+                async (item) =>
+                    await Account.updateOne(
+                        { _id: item._id, "homeList._id": homeId },
+                        {
+                            $set: {
+                                "homeList.$.homeName": newName,
+                                "homeList.$.homeAddress": newAddress,
+                            },
+                        }
+                    )
+            );
+
+            await newHomeData.save();
+            // Trả về thông tin mới của căn nhà
+            return res.send({
+                result: "success",
+                newHomeData: newHomeData,
             });
         } catch (error) {
             res.send({
@@ -278,6 +376,94 @@ const homeController = {
             return res.send({
                 result: "success",
                 message: "Xác nhận thành công!",
+            });
+        } catch (error) {
+            res.send({
+                result: "failed",
+                message: error,
+            });
+        }
+    },
+
+    refuseJoinHome: async (req, res) => {
+        try {
+            // accessToken của chủ nhà
+            const accessToken = req.headers.authorization.split(" ")[1];
+
+            // Đầu vào: id nhà và id tài khoản đang bị từ chối
+            const { homeId, accountId } = req.body;
+            const account = await Account.findOne({
+                accessToken: accessToken,
+            });
+            if (!account) {
+                return res.send({
+                    result: "failed",
+                    message: "Không có quyền truy cập",
+                });
+            }
+
+            // Xóa thông tin tài khoản bị từ chối khỏi accountList của căn nhà
+            const homeData = await Home.findByIdAndUpdate(homeId, {
+                $pull: {
+                    accountList: { _id: accountId },
+                },
+            });
+
+            // Xóa thông tin nhà khỏi homeList của tài khoản bị từ chối
+            const accountData = await Account.findByIdAndUpdate(accountId, {
+                $pull: {
+                    homeList: { _id: homeId },
+                },
+            });
+
+            // Trả về
+            return res.send({
+                result: "success",
+                message: "Từ chối thành công!",
+            });
+        } catch (error) {
+            res.send({
+                result: "failed",
+                message: error,
+            });
+        }
+    },
+
+    deleteMember: async (req, res) => {
+        try {
+            // accessToken của chủ nhà
+            const accessToken = req.headers.authorization.split(" ")[1];
+
+            // Đầu vào: id nhà và id tài khoản đang bị xóa
+            const { homeId, accountId } = req.body;
+            const account = await Account.findOne({
+                accessToken: accessToken,
+            });
+            if (!account) {
+                return res.send({
+                    result: "failed",
+                    message: "Không có quyền truy cập",
+                });
+            }
+
+            // Xóa thông tin tài khoản bị xóa khỏi accountList của căn nhà
+            const homeData = await Home.findByIdAndUpdate(homeId, {
+                $pull: {
+                    accountList: { _id: accountId },
+                },
+            });
+
+            // Xóa thông tin nhà khỏi homeList của tài khoản bị xóa
+            const accountData = await Account.findByIdAndUpdate(accountId, {
+                $pull: {
+                    homeList: { _id: homeId },
+                },
+            });
+
+            // Trả về
+            return res.send({
+                result: "success",
+                message: "Xóa thành công!",
             });
         } catch (error) {
             res.send({

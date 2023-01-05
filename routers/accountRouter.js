@@ -15,6 +15,9 @@ router.post('/api/account/sign-up', accountController.signUp);
 //get account data
 router.get('/api/account/detail', accountController.getAccountData);
 
+//update account data
+router.put('/api/account/update', accountController.updateAccountData);
+
 //sign in
 router.post('/api/account/sign-in', accountController.signIn);
 

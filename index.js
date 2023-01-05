@@ -4,6 +4,8 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const accountRouter = require("./routers/accountRouter");
 const homeRouter = require("./routers/homeRouter");
+const roomRouter = require("./routers/roomRouter");
+const deviceRouter = require("./routers/deviceRouter");
 // const admin = require('./routers/admin')
 // const room = require('./routers/room')
 // const device = require('./routers/device')
@@ -54,6 +56,14 @@ app.use(accountRouter, function (req, res, next) {
 });
 
 app.use(homeRouter, function (req, res, next) {
+    next();
+});
+
+app.use(roomRouter, function (req, res, next) {
+    next();
+});
+
+app.use(deviceRouter, function (req, res, next) {
     next();
 });
 //recvData();

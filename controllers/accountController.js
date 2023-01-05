@@ -183,6 +183,7 @@ const accountController = {
             });
         }
     },
+    
     signIn: async (req, res) => {
         try {
             const account = await Account.findOne({
@@ -255,6 +256,55 @@ const accountController = {
         }
     },
 
+    updateAccountData: async (req, res) => {
+        try {
+            const accessToken = req.headers.authorization.split(" ")[1];
+
+            // Đầu vào: Dữ liệu mới của tài khoản (trừ homeList)
+            const newData = req.body;
+            const account = await Account.findOne({
+                accessToken: accessToken,
+            });
+            if (!account) {
+                return res.send({
+                    result: "failed",
+                    message: "Không có quyền truy cập",
+                });
+            }
+            // Cập nhật thông tin mới
+            const newAccountData = await Account.findByIdAndUpdate(account._id, {
+                ...newData
+            });
+
+            // Sửa thông tin nhà ở accountList của các nhà liên quan
+            account.homeList.map(
+                async (item) =>
+                    await Home.updateOne(
+                        { _id: item._id, "accountList._id": account._id },
+                        {
+                            $set: {
+                                "accountList.$.fullname": newData.fullname,
+                                "accountList.$.avatar": newData.avatar,
+                            },
+                        }
+                    )
+            );
+
+            await newAccountData.save();
+
+            // Trả về thông tin mới của tài khoản
+            return res.send({
+                result: "success",
+                newAccountData: newAccountData,
+            });
+        } catch (error) {
+            res.send({
+                result: "failed",
+                message: error,
+            });
+        }
+    },
+
     signOut: async (req, res) => {
         try {
             const accessToken = req.headers.authorization.split(" ")[1];
@@ -278,6 +328,7 @@ const accountController = {
             });
         }
     },
+
     changePassword: async (req, res) => {
         try {
             const accessToken = req.headers.authorization.split(" ")[1];
