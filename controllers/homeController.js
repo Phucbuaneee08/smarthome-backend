@@ -310,7 +310,7 @@ const homeController = {
 
             // Cập nhật thêm thông tin nhà vào danh sách nhà của tài khoản,
             // trạng thái đang yêu cầu
-            await Account.findByIdAndUpdate(account._id, {
+            const currentAccount =  await Account.findByIdAndUpdate(account._id, {
                 $addToSet: {
                     homeList: {
                         _id: homeData._id,
@@ -324,7 +324,7 @@ const homeController = {
             // Trả về
             return res.send({
                 result: "success",
-                message: "Gửi yêu cầu thành công!",
+                account: currentAccount,
             });
         } catch (error) {
             res.send({
