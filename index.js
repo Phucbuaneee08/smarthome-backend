@@ -44,7 +44,7 @@ app.use(
 
 // connect database
 connection();
-connectMQTT();
+// connectMQTT();
 
 app.get("/", (req, res) => {
     res.send("SUCCESS");
