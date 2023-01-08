@@ -324,6 +324,7 @@ const homeController = {
             // Trả về
             return res.send({
                 result: "success",
+                req: req.body,
                 message: "Gửi yêu cầu thành công!",
             });
         } catch (error) {
