@@ -204,7 +204,7 @@ const homeController = {
             const accessToken = req.headers.authorization.split(" ")[1];
 
             // Đầu vào: id của nhà muốn lấy dữ liệu
-            const homeId = req.query.homeId;
+            const homeId = req.query;
             const account = await Account.findOne({
                 accessToken: accessToken,
             });
@@ -283,7 +283,7 @@ const homeController = {
             const accessToken = req.headers.authorization.split(" ")[1];
 
             // Đầu vào: id nhà muốn được Join vào
-            const homeId = req.body.homeId;
+            const homeId = req.body;
             const account = await Account.findOne({
                 accessToken: accessToken,
             });
@@ -419,7 +419,7 @@ const homeController = {
             // Trả về
             return res.send({
                 result: "success",
-                message: "Từ chối thành công!",
+                message: "Hủy yêu cầu thành công!",
             });
         } catch (error) {
             res.send({
