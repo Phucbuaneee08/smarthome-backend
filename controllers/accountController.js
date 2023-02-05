@@ -7,6 +7,7 @@ const {
     generateRandomStr,
     sha256
 } = require("../utils");
+const { cloudinary } = require("../utils/cloudinary");
 
 // const changePassword = async (req, res) => {
 //     try {
@@ -270,6 +271,9 @@ const accountController = {
                     result: "failed",
                     message: "Không có quyền truy cập",
                 });
+            }
+            if (newData.avatar){
+                newData.avatar = cloudinary.uploader.upload(newData.avatar);
             }
             // Cập nhật thông tin mới
             const newAccountData = await Account.findByIdAndUpdate(account._id, {
