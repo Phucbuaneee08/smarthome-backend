@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const accountController = require('../controllers/accountController')
+const uploadCloud =  require('../utils/cloudinary')
 
 
 // router.post('/login', login);
@@ -16,8 +17,7 @@ router.post('/api/account/sign-up', accountController.signUp);
 router.get('/api/account/detail', accountController.getAccountData);
 
 //update account data
-router.put('/api/account/update', accountController.updateAccountData);
-router.put('/api/account/avatar', accountController.updateAvatar);
+router.put('/api/account/update', uploadCloud.single('avatar') , accountController.updateAccountData);
 
 //sign in
 router.post('/api/account/sign-in', accountController.signIn);

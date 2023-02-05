@@ -7,8 +7,6 @@ const {
     generateRandomStr,
     sha256
 } = require("../utils");
-const { cloudinary } = require("../utils/cloudinary");
-
 // const changePassword = async (req, res) => {
 //     try {
 //         const account = req.body;
@@ -262,7 +260,8 @@ const accountController = {
             const accessToken = req.headers.authorization.split(" ")[1];
 
             // Đầu vào: Dữ liệu mới của tài khoản (trừ homeList)
-            const newData = req.body;
+            const fileData = req.file;
+            const newData = {...req.body, avatar: fileData?.path};
             const account = await Account.findOne({
                 accessToken: accessToken,
             });
@@ -271,9 +270,6 @@ const accountController = {
                     result: "failed",
                     message: "Không có quyền truy cập",
                 });
-            }
-            if (newData.avatar){
-                newData.avatar = cloudinary.uploader.upload(newData.avatar);
             }
             // Cập nhật thông tin mới
             const newAccountData = await Account.findByIdAndUpdate(account._id, {
@@ -307,26 +303,6 @@ const accountController = {
                 message: error,
             });
         }
-    },
-
-    updateAvatar: async (req, res) => {
-        const data = {
-            avatar: req.body.avatar,
-          }
-      
-          // upload image here
-          cloudinary.uploader.upload(data.avatar)
-          .then((result) => {
-            response.status(200).send({
-              message: "success",
-              result,
-            });
-          }).catch((error) => {
-            response.status(500).send({
-              message: "failure",
-              error,
-            });
-          });
     },
 
     signOut: async (req, res) => {
