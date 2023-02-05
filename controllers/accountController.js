@@ -309,6 +309,26 @@ const accountController = {
         }
     },
 
+    updateAvatar: async (req, res) => {
+        const data = {
+            avatar: req.body.avatar,
+          }
+      
+          // upload image here
+          cloudinary.uploader.upload(data.avatar)
+          .then((result) => {
+            response.status(200).send({
+              message: "success",
+              result,
+            });
+          }).catch((error) => {
+            response.status(500).send({
+              message: "failure",
+              error,
+            });
+          });
+    },
+
     signOut: async (req, res) => {
         try {
             const accessToken = req.headers.authorization.split(" ")[1];
