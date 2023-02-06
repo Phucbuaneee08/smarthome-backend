@@ -234,7 +234,7 @@ const homeController = {
             const accessToken = req.headers.authorization.split(" ")[1];
 
             // Đầu vào: Dữ liệu mới của nhà (name, address)
-            const { homeId, newName, newAddress } = req.body;
+            const { _id, name, address } = req.body;
             const account = await Account.findOne({
                 accessToken: accessToken,
             });
@@ -245,20 +245,20 @@ const homeController = {
                 });
             }
             // Cập nhật thông tin mới
-            const newHomeData = await Home.findByIdAndUpdate(homeId, {
-                name: newName,
-                address: newAddress,
+            const newHomeData = await Home.findByIdAndUpdate(_id, {
+                name: name,
+                address: address,
             });
 
             // Sửa thông tin nhà ở homeList của các tài khoản liên quan
             newHomeData.accountList.map(
                 async (item) =>
                     await Account.updateOne(
-                        { _id: item._id, "homeList._id": homeId },
+                        { _id: item._id, "homeList._id": _id },
                         {
                             $set: {
-                                "homeList.$.homeName": newName,
-                                "homeList.$.homeAddress": newAddress,
+                                "homeList.$.homeName": name,
+                                "homeList.$.homeAddress": address,
                             },
                         }
                     )

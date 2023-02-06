@@ -291,7 +291,7 @@ const roomController = {
             const accessToken = req.headers.authorization.split(" ")[1];
 
             // Đầu vào: Dữ liệu mới của phòng
-            const { homeId , roomId, newName } = req.body;
+            const { homeId , roomId, name } = req.body;
             const account = await Account.findOne({
                 accessToken: accessToken,
             });
@@ -303,7 +303,7 @@ const roomController = {
             }
             // Cập nhật thông tin mới
             const newRoomData = await Room.findByIdAndUpdate(roomId, {
-                name: newName,
+                name: name,
             });
 
             // Sửa thông tin phòng ở roomsList của nhà
@@ -311,7 +311,7 @@ const roomController = {
                         { _id: homeId, "roomsList._id": roomId },
                         {
                             $set: {
-                                'roomsList.$.roomName': newName,
+                                'roomsList.$.roomName': name,
                             },
                         }
                     )
