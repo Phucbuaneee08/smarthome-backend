@@ -219,7 +219,7 @@ const roomController = {
             const accessToken = req.headers.authorization.split(" ")[1];
 
             // Đầu vào: Id của nhà và, Id của phòng bị xóa
-            const { homeId, roomId } = req.body;
+            const { homeId, roomId } = req.query;
             const account = await Account.findOne({
                 accessToken: accessToken,
             });

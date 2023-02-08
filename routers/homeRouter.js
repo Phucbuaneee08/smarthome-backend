@@ -9,7 +9,7 @@ const router = express.Router()
 router.post('/api/home/create-home', homeController.createHome);
 
 //delete home
-router.post('/api/home/delete-home', homeController.deleteHome);
+router.delete('/api/home/delete-home', homeController.deleteHome);
 
 //update home data
 router.put('/api/home/update', homeController.updateHomeData);
@@ -30,5 +30,5 @@ router.post('/api/home/confirm-join-home', homeController.confirmJoinHome);
 router.post('/api/home/refuse-join-home', homeController.refuseJoinHome);
 
 //delete member
-router.post('/api/home/delete-member', homeController.deleteMember);
+router.delete('/api/home/delete-member', homeController.deleteMember);
 module.exports = router

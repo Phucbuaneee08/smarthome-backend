@@ -13,7 +13,7 @@ const router = express.Router()
 router.post('/api/room/create-room', roomController.createRoom);
 
 //delete room
-router.post('/api/room/delete-room', roomController.deleteRoom);
+router.delete('/api/room/delete-room', roomController.deleteRoom);
 
 //update room data
 router.put('/api/room/update', roomController.updateRoomData);

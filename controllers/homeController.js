@@ -436,7 +436,7 @@ const homeController = {
             const accessToken = req.headers.authorization.split(" ")[1];
 
             // Đầu vào: id nhà và id tài khoản đang bị xóa
-            const { homeId, accountId } = req.body;
+            const { homeId, accountId } = req.query;
             const account = await Account.findOne({
                 accessToken: accessToken,
             });
