@@ -160,7 +160,7 @@ const accountController = {
                 username: req.body.username,
                 password: hashed,
                 accessToken: "",
-                gender: "UNKNOWN",
+                gender: "",
                 dob: null,
                 avatar: "",
                 email: "",
