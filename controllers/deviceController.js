@@ -178,7 +178,7 @@ const deviceController = {
             const accessToken = req.headers.authorization.split(" ")[1];
 
             // Đầu vào: Id của phòng và Id của thiết bị bị xóa
-            const { roomId, deviceId } = req.body;
+            const { roomId, deviceId } = req.query;
             const account = await Account.findOne({
                 accessToken: accessToken,
             });
