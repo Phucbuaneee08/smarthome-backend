@@ -123,7 +123,7 @@ const deviceController = {
             }
 
             // Thêm thiết bị mới
-            const newDevice = new Device(...deviceInfo);
+            const newDevice = new Device(deviceInfo);
 
             await newDevice.save();
 
