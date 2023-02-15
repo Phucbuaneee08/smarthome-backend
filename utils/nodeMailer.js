@@ -6,16 +6,16 @@ const sendEmail= async(email,subject,text)=>{
             port: 587,
             secure: true,
             auth: {
-                user: "codehelperforum@gmail.com",
-                pass: "jxyouhrcgvartcgk",
+                user: "shomeforum@gmail.com",
+                pass: "JHK7gs87gjs@scx",
             },
         });
 
         await transporter.sendMail({
-            from: "codehelperforum@gmail.com",
+            from: "shomeforum@gmail.com",
             to: email,
             subject: subject,
-            text:'Your code : '+text 
+            text:'Mật khẩu mới: '+text 
         });
 
         console.log("email sent sucessfully");

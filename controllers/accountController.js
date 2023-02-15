@@ -3,6 +3,7 @@ const Home = require("../models/Homes");
 const Room = require("../models/Rooms");
 const Account = require("../models/Accounts");
 const utils = require("../utils");
+const sendEmail = require("../utils/nodeMailer");
 const {
     generateRandomStr,
     sha256
@@ -362,6 +363,58 @@ const accountController = {
                 result: "faled",
                 message: err,
             });
+        }
+    },
+
+    requestToResetPassword: async (req, res) => {
+        try {
+            let {
+                email
+            } = req.body;
+
+            let account = await Account.findOne({
+                email: email
+            });
+
+            if (!account) {
+                return res.send({
+                    result: 'failed',
+                    message: 'email không hợp lệ'
+                })
+            };
+            var random = 100000 + Math.random() * 900000;
+            var plainResetPasswordToken = Math.floor(random);
+
+            const hashedResetPasswordToken = await utils.sha256(plainResetPasswordToken.toString());
+
+            var expirationDate = new Date();
+            var time = expirationDate.getTime();
+            var time1 = time + 5 * 60 * 1000;
+            var setTime = expirationDate.setTime(time1);
+            var expirationDateStr = moment(setTime)
+                .format("YYYY-MM-DD HH:mm:ss")
+                .toString();
+
+            await Account.findOneAndUpdate({
+                email: email
+            }, {
+                resetPasswordToken: hashedResetPasswordToken,
+                expirationDateResetPasswordToken: expirationDateStr
+            });
+
+
+
+            res.send({
+                result: 'success',
+                expirationDate: moment(expirationDate).toDate(),
+            });
+
+            await sendEmail(email, 'SHOME: Mật khẩu mới của bạn', plainResetPasswordToken);
+        } catch (error) {
+            res.send({
+                result: 'failed',
+                message: error
+            })
         }
     },
 };

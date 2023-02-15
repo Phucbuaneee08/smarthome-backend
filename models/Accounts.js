@@ -52,6 +52,9 @@ const accounts = new Schema(
                 }
             },
         ],
+        expirationDateToken: Date,
+        resetPasswordToken: String,
+        expirationDateResetPasswordToken: String,
     },
     { timestamps: true }
 );
