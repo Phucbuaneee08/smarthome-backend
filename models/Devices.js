@@ -10,6 +10,10 @@ const devices = mongoose.Schema(
             type: String,
             default: "",
         },
+        roomId: {
+            type: mongoose.SchemaTypes.ObjectId,
+            ref: "rooms",
+        },
         value: String,
         control: {
             status: {

@@ -110,8 +110,8 @@ const deviceController = {
         try {
             const accessToken = req.headers.authorization.split(" ")[1];
 
-            // Đầu vào: roomId và thông tin mới của thiết bị
-            const { roomId, deviceInfo } = req.body;
+            // Đầu vào: thông tin mới của thiết bị {roomId, deviceName, deviceType}
+            const deviceInfo  = req.body;
             const account = await Account.findOne({
                 accessToken: accessToken,
             });
@@ -123,12 +123,12 @@ const deviceController = {
             }
 
             // Thêm thiết bị mới
-            const newDevice = new Device(deviceInfo);
+            const newDevice = new Device(...deviceInfo);
 
             await newDevice.save();
 
             // Thêm thông tin thiết bị mới vào devicesList của phòng này
-            await Room.findByIdAndUpdate(roomId, {
+            await Room.findByIdAndUpdate(newDevice.roomId, {
                 $addToSet: {
                     devicesList: {
                         _id: newDevice._id,
@@ -177,8 +177,8 @@ const deviceController = {
         try {
             const accessToken = req.headers.authorization.split(" ")[1];
 
-            // Đầu vào: Id của phòng và Id của thiết bị bị xóa
-            const { roomId, deviceId } = req.query;
+            // Đầu vào: Id của thiết bị bị xóa
+            const  deviceId  = req.query;
             const account = await Account.findOne({
                 accessToken: accessToken,
             });
@@ -188,10 +188,13 @@ const deviceController = {
                     message: "Không có quyền truy cập",
                 });
             }
+            const deviceInfo = await Account.findById({
+                _id: deviceId,
+            });
 
             // Xóa thông tin thiết bị khỏi devicesList của phòng đó
             await Room.updateOne(
-                { _id: roomId },
+                { _id: deviceInfo.roomId },
                 {
                     $pull: {
                         devicesList: { _id: deviceId },

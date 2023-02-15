@@ -13,7 +13,7 @@ const router = express.Router()
 router.post('/api/device/create-device', deviceController.createDevice);
 
 //delete device
-router.post('/api/device/delete-device', deviceController.deleteDevice);
+router.delete('/api/device/delete-device', deviceController.deleteDevice);
 
 // //control device
 // router.put('/api/device/control', deviceController.controlDevice);
