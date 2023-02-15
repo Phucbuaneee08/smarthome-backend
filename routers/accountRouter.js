@@ -28,4 +28,7 @@ router.post('/api/account/sign-out',  accountController.signOut);
 //change password
 router.put('/api/account/change-password', accountController.changePassword);
 
+//request to reset password
+router.post('/api/v1/account/request-reset-password', accountController.requestToResetPassword)
+
 module.exports = router;
