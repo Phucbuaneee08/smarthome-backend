@@ -198,14 +198,12 @@ const deviceController = {
             if (homeId) {
                 let DevicesOfHome = [];
                 const currentHome = await Home.findById(homeId);
-                if (currentHome.roomsList.length > 0) {
                     for (let i = 0; i < currentHome.roomsList.length; i++) {
                         const DevicesOfRoom = await Device.find({
                             roomId: currentHome.roomsList[i]._id,
                         });
                         DevicesOfHome = DevicesOfHome.concat(DevicesOfRoom);
                     }
-                }
                 // Trả về danh sách các thiết bị
                 return res.send({
                     result: "success",
