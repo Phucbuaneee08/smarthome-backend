@@ -111,7 +111,7 @@ const deviceController = {
             const accessToken = req.headers.authorization.split(" ")[1];
 
             // Đầu vào: thông tin mới của thiết bị {roomId, deviceName, deviceType}
-            const deviceInfo  = req.body;
+            const deviceInfo = req.body;
             const account = await Account.findOne({
                 accessToken: accessToken,
             });
@@ -150,6 +150,46 @@ const deviceController = {
         }
     },
 
+    getDevicesList: async (req, res) => {
+        try {
+            const accessToken = req.headers.authorization.split(" ")[1];
+
+            // Đầu vào: homeId hoặc roomId hoặc để trống
+            const { homeId } = req.query;
+            const account = await Account.findOne({
+                accessToken: accessToken,
+            });
+            if (!account) {
+                return res.send({
+                    result: "failed",
+                    message: "Không có quyền truy cập",
+                });
+            }
+            if (homeId) {
+                let DevicesOfHome = [];
+                const currentHome = await Home.findById({ _id: homeId });
+                if (currentHome.roomsList.length > 0) {
+                    for (let i = 0; i < currentHome.roomsList.length; i++) {
+                        const DevicesOfRoom = await Device.find({
+                            roomId: currentHome.roomsList[i]._id,
+                        });
+                        DevicesOfHome = DevicesOfHome.concat(DevicesOfRoom);
+                    }
+                }
+                // Trả về danh sách các thiết bị
+                return res.send({
+                    result: "success",
+                    DevicesOfHome: DevicesOfHome,
+                });
+            }
+        } catch (error) {
+            res.send({
+                result: "failed",
+                message: error,
+            });
+        }
+    },
+
     // deleteDevice: async (req, res) => {
     //     try {
     //         const { deviceId, roomId } = req.body;
@@ -178,7 +218,7 @@ const deviceController = {
             const accessToken = req.headers.authorization.split(" ")[1];
 
             // Đầu vào: Id của thiết bị bị xóa
-            const  deviceId  = req.query;
+            const deviceId = req.query;
             const account = await Account.findOne({
                 accessToken: accessToken,
             });
@@ -208,7 +248,7 @@ const deviceController = {
             //Thông báo thành công
             return res.send({
                 result: "success",
-                message: "Xóa thiết bị thành công"
+                message: "Xóa thiết bị thành công",
             });
         } catch (error) {
             res.send({
