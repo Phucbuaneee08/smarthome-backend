@@ -166,7 +166,7 @@ const deviceController = {
                 });
             }
 
-            const DeviceData = await Device.findById({ _id: deviceId });
+            const DeviceData = await Device.findById( deviceId );
             // Trả về dữ liệu thiết bị
             return res.send({
                 result: "success",
@@ -197,7 +197,7 @@ const deviceController = {
             }
             if (homeId) {
                 let DevicesOfHome = [];
-                const currentHome = await Home.findById({ _id: homeId });
+                const currentHome = await Home.findById(homeId);
                 if (currentHome.roomsList.length > 0) {
                     for (let i = 0; i < currentHome.roomsList.length; i++) {
                         const DevicesOfRoom = await Device.find({
