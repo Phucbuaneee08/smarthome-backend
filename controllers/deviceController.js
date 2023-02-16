@@ -150,11 +150,41 @@ const deviceController = {
         }
     },
 
+    getDeviceData: async (req, res) => {
+        try {
+            const accessToken = req.headers.authorization.split(" ")[1];
+
+            // Đầu vào: deviceId
+            const { deviceId } = req.query;
+            const account = await Account.findOne({
+                accessToken: accessToken,
+            });
+            if (!account) {
+                return res.send({
+                    result: "failed",
+                    message: "Không có quyền truy cập",
+                });
+            }
+
+            const DeviceData = await Device.findById({ _id: deviceId });
+            // Trả về dữ liệu thiết bị
+            return res.send({
+                result: "success",
+                DeviceData: DeviceData,
+            });
+        } catch (error) {
+            res.send({
+                result: "failed",
+                message: error,
+            });
+        }
+    },
+
     getDevicesList: async (req, res) => {
         try {
             const accessToken = req.headers.authorization.split(" ")[1];
 
-            // Đầu vào: homeId hoặc roomId hoặc để trống
+            // Đầu vào: homeId hoặc để trống
             const { homeId } = req.query;
             const account = await Account.findOne({
                 accessToken: accessToken,
@@ -180,6 +210,13 @@ const deviceController = {
                 return res.send({
                     result: "success",
                     DevicesOfHome: DevicesOfHome,
+                });
+            } else {
+                const AllDevices = await Device.find();
+                // Trả về danh sách tất cả các thiết bị
+                return res.send({
+                    result: "success",
+                    AllDevices: AllDevices,
                 });
             }
         } catch (error) {

@@ -12,6 +12,12 @@ const router = express.Router()
 //create device
 router.post('/api/device/create-device', deviceController.createDevice);
 
+//get device data
+router.get('/api/device/detail', deviceController.getDeviceData);
+
+//get devices list
+router.get('/api/device/find', deviceController.getDevicesList);
+
 //delete device
 router.delete('/api/device/delete-device', deviceController.deleteDevice);
 
