@@ -22,6 +22,6 @@ router.put('/api/room/update', roomController.updateRoomData);
 router.get('/api/room/detail', roomController.getRoomData);
 
 //get room list of home
-router.get('/api/room/find-by-home', roomController.getRoomsListOfHome);
+router.get('/api/room/find', roomController.getRoomsList);
 
 module.exports = router

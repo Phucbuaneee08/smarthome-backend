@@ -289,7 +289,7 @@ const roomController = {
         }
     },
 
-    getRoomsListOfHome: async (req, res) => {
+    getRoomsList: async (req, res) => {
         try {
             const accessToken = req.headers.authorization.split(" ")[1];
 
@@ -304,12 +304,12 @@ const roomController = {
                     message: "Không có quyền truy cập",
                 });
             }
-            const roomsListOfHome = await Room.find({homeId: homeId});
+            const roomsList = await Room.find({homeId: homeId});
             
             // Trả về danh sách phòng của căn nhà
             return res.send({
                 result: "success",
-                roomsListOfHome: roomsListOfHome,
+                roomsList: roomsList,
             });
         } catch (error) {
             res.send({
