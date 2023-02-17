@@ -180,6 +180,50 @@ const deviceController = {
         }
     },
 
+    updateDeviceData: async (req, res) => {
+        try {
+            const accessToken = req.headers.authorization.split(" ")[1];
+
+            // Đầu vào: id thiết bị và tên mới của thiết bị
+            const {  deviceId, newName } = req.body;
+            const account = await Account.findOne({
+                accessToken: accessToken,
+            });
+            if (!account) {
+                return res.send({
+                    result: "failed",
+                    message: "Không có quyền truy cập",
+                });
+            }
+            // Cập nhật thông tin mới
+            const newDeviceData = await Device.findByIdAndUpdate(deviceId, {
+                deviceName: newName,
+            });
+
+            // Sửa thông tin thieets ở devicesList của phòng
+                    await Room.updateOne(
+                        { _id: newDeviceData.roomId, "devicesList._id": deviceId },
+                        {
+                            $set: {
+                                'devicesList.$.deviceName': newName,
+                            },
+                        }
+                    )
+
+            await newDeviceData.save();
+
+            return res.send({
+                result: "success",
+                message : "Cập nhật thành công"
+            });
+        } catch (error) {
+            res.send({
+                result: "failed",
+                message: error,
+            });
+        }
+    },
+
     getDevicesList: async (req, res) => {
         try {
             const accessToken = req.headers.authorization.split(" ")[1];
@@ -232,29 +276,6 @@ const deviceController = {
         }
     },
 
-    // deleteDevice: async (req, res) => {
-    //     try {
-    //         const { deviceId, roomId } = req.body;
-    //         await Room.findByIdAndUpdate(
-    //             { _id: roomId },
-    //             {
-    //                 $pull: {
-    //                     devices: [{ _id: deviceId }],
-    //                 },
-    //             }
-    //         );
-    //         res.status(200).json({
-    //             status: "OK",
-    //             msg: "Delete device success!",
-    //         });
-    //     } catch (err) {
-    //         res.status(500).json({
-    //             status: "ERR",
-    //             msg: "Server error",
-    //             error: err,
-    //         });
-    //     }
-    // },
     deleteDevice: async (req, res) => {
         try {
             const accessToken = req.headers.authorization.split(" ")[1];

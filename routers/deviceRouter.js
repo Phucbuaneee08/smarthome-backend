@@ -15,6 +15,9 @@ router.post('/api/device/create', deviceController.createDevice);
 //get device data
 router.get('/api/device/detail', deviceController.getDeviceData);
 
+//update device data
+router.put('/api/device/update', deviceController.updateDeviceData);
+
 //get devices list
 router.get('/api/device/find', deviceController.getDevicesList);
 
