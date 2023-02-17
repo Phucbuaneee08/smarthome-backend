@@ -166,11 +166,11 @@ const deviceController = {
                 });
             }
 
-            const DeviceData = await Device.findById(deviceId);
+            const deviceData = await Device.findById(deviceId);
             // Trả về dữ liệu thiết bị
             return res.send({
                 result: "success",
-                DeviceData: DeviceData,
+                deviceData: deviceData,
             });
         } catch (error) {
             res.send({
@@ -204,17 +204,17 @@ const deviceController = {
                 //         });
                 //         DevicesOfHome = DevicesOfHome.concat(DevicesOfRoom);
                 //     }
-                const roomsListOfHome = await Room.find({ homeId: homeId });
-                let devicesOfHome = [];
-                for (let i = 0; i < roomsListOfHome.length; i++) {
-                    devicesOfHome = devicesOfHome.concat(
-                        await Device.find({ roomId: roomsListOfHome[i]._id })
+                const roomsList = await Room.find({ homeId: homeId });
+                let devicesList = [];
+                for (let i = 0; i < roomsList.length; i++) {
+                    devicesList = devicesList.concat(
+                        await Device.find({ roomId: roomsList[i]._id })
                     );
                 }
                 // Trả về danh sách các thiết bị
                 return res.send({
                     result: "success",
-                    devicesOfHome: devicesOfHome,
+                    devicesList: devicesList,
                 });
             } else {
                 const AllDevices = await Device.find();

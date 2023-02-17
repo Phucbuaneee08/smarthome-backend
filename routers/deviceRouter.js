@@ -10,7 +10,7 @@ const router = express.Router()
 // router.get('/:type/:roomId',getData)
 
 //create device
-router.post('/api/device/create-device', deviceController.createDevice);
+router.post('/api/device/create', deviceController.createDevice);
 
 //get device data
 router.get('/api/device/detail', deviceController.getDeviceData);
@@ -19,7 +19,7 @@ router.get('/api/device/detail', deviceController.getDeviceData);
 router.get('/api/device/find', deviceController.getDevicesList);
 
 //delete device
-router.delete('/api/device/delete-device', deviceController.deleteDevice);
+router.delete('/api/device/delete', deviceController.deleteDevice);
 
 // //control device
 // router.put('/api/device/control', deviceController.controlDevice);
