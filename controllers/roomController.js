@@ -186,7 +186,8 @@ const roomController = {
 
             // Thêm phòng mới
             const newRoom = new Room({
-                name: newNameRoom,
+                homeId: homeId,
+                roomName: newNameRoom,
             });
 
             await newRoom.save();
@@ -196,7 +197,7 @@ const roomController = {
                 $addToSet: {
                     roomsList: {
                         _id: newRoom._id,
-                        roomName: newRoom.name,
+                        roomName: newRoom.roomName,
                     },
                 },
             });
@@ -218,8 +219,8 @@ const roomController = {
         try {
             const accessToken = req.headers.authorization.split(" ")[1];
 
-            // Đầu vào: Id của nhà và, Id của phòng bị xóa
-            const { homeId, roomId } = req.query;
+            // Đầu vào: Id của phòng bị xóa
+            const { roomId } = req.query;
             const account = await Account.findOne({
                 accessToken: accessToken,
             });
@@ -230,9 +231,11 @@ const roomController = {
                 });
             }
 
+            const roomData = await Room.findById(roomId);
+
             // Xóa thông tin phòng khỏi roomsList của nhà đó
             await Home.updateOne(
-                { _id: homeId },
+                { _id: roomData.homeId },
                 {
                     $pull: {
                         roomsList: { _id: roomId },
@@ -261,7 +264,7 @@ const roomController = {
             const accessToken = req.headers.authorization.split(" ")[1];
 
             // Đầu vào: id của phòng muốn lấy dữ liệu
-            const roomId = req.query.roomId;
+            const { roomId } = req.query;
             const account = await Account.findOne({
                 accessToken: accessToken,
             });
@@ -286,12 +289,42 @@ const roomController = {
         }
     },
 
+    getRoomsListOfHome: async (req, res) => {
+        try {
+            const accessToken = req.headers.authorization.split(" ")[1];
+
+            // Đầu vào: homeId
+            const { homeId } = req.query;
+            const account = await Account.findOne({
+                accessToken: accessToken,
+            });
+            if (!account) {
+                return res.send({
+                    result: "failed",
+                    message: "Không có quyền truy cập",
+                });
+            }
+            const roomsListOfHome = await Room.find({homeId: homeId});
+            
+            // Trả về danh sách phòng của căn nhà
+            return res.send({
+                result: "success",
+                roomsListOfHome: roomsListOfHome,
+            });
+        } catch (error) {
+            res.send({
+                result: "failed",
+                message: error,
+            });
+        }
+    },
+
     updateRoomData: async (req, res) => {
         try {
             const accessToken = req.headers.authorization.split(" ")[1];
 
             // Đầu vào: Dữ liệu mới của phòng
-            const { homeId , roomId, name } = req.body;
+            const {  roomId, newName } = req.body;
             const account = await Account.findOne({
                 accessToken: accessToken,
             });
@@ -303,15 +336,15 @@ const roomController = {
             }
             // Cập nhật thông tin mới
             const newRoomData = await Room.findByIdAndUpdate(roomId, {
-                name: name,
+                roomName: newName,
             });
 
             // Sửa thông tin phòng ở roomsList của nhà
                     await Home.updateOne(
-                        { _id: homeId, "roomsList._id": roomId },
+                        { _id: newRoomData.homeId, "roomsList._id": roomId },
                         {
                             $set: {
-                                'roomsList.$.roomName': name,
+                                'roomsList.$.roomName': newName,
                             },
                         }
                     )

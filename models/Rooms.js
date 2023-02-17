@@ -2,21 +2,11 @@ const mongoose = require("mongoose");
 
 const rooms = mongoose.Schema(
     {
-        // name: {
-        //     type: String,
-        //     default: ''
-        // },
-        // home: {
-        //     type: mongoose.SchemaTypes.ObjectId,
-        //     ref: 'homes'
-        // },
-        // devices: [
-        //     {
-        //         type: mongoose.SchemaTypes.ObjectId,
-        //         ref: 'devices'
-        //     }
-        // ]
-        name: String,
+        homeId: {
+            type: mongoose.SchemaTypes.ObjectId,
+            ref: 'homes'
+        },
+        roomName: String,
         devicesList: [
             {
                 _id: {

@@ -166,7 +166,7 @@ const deviceController = {
                 });
             }
 
-            const DeviceData = await Device.findById( deviceId );
+            const DeviceData = await Device.findById(deviceId);
             // Trả về dữ liệu thiết bị
             return res.send({
                 result: "success",
@@ -196,18 +196,25 @@ const deviceController = {
                 });
             }
             if (homeId) {
-                let DevicesOfHome = [];
-                const currentHome = await Home.findById(homeId);
-                    for (let i = 0; i < currentHome.roomsList.length; i++) {
-                        const DevicesOfRoom = await Device.find({
-                            roomId: currentHome.roomsList[i]._id,
-                        });
-                        DevicesOfHome = DevicesOfHome.concat(DevicesOfRoom);
-                    }
+                // let DevicesOfHome = [];
+                // const currentHome = await Home.findById(homeId);
+                //     for (let i = 0; i < currentHome.roomsList.length; i++) {
+                //         let DevicesOfRoom = await Device.find({
+                //             roomId: currentHome.roomsList[i]._id,
+                //         });
+                //         DevicesOfHome = DevicesOfHome.concat(DevicesOfRoom);
+                //     }
+                const roomsListOfHome = await Room.find({ homeId: homeId });
+                let devicesOfHome = [];
+                for (let i = 0; i < roomsListOfHome.length; i++) {
+                    devicesOfHome = devicesOfHome.concat(
+                        await Device.find({ roomId: roomsListOfHome[i]._id })
+                    );
+                }
                 // Trả về danh sách các thiết bị
                 return res.send({
                     result: "success",
-                    DevicesOfHome: DevicesOfHome,
+                    devicesOfHome: devicesOfHome,
                 });
             } else {
                 const AllDevices = await Device.find();
@@ -263,9 +270,7 @@ const deviceController = {
                     message: "Không có quyền truy cập",
                 });
             }
-            const deviceInfo = await Account.findById({
-                _id: deviceId,
-            });
+            const deviceInfo = await Device.findById(deviceId);
 
             // Xóa thông tin thiết bị khỏi devicesList của phòng đó
             await Room.updateOne(
