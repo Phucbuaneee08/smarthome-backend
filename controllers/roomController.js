@@ -173,7 +173,7 @@ const roomController = {
             const accessToken = req.headers.authorization.split(" ")[1];
 
             // Đầu vào: homeId và thông tin mới của phòng
-            const { homeId, newNameRoom } = req.body;
+            const { homeId, newName } = req.body;
             const account = await Account.findOne({
                 accessToken: accessToken,
             });
@@ -187,7 +187,7 @@ const roomController = {
             // Thêm phòng mới
             const newRoom = new Room({
                 homeId: homeId,
-                roomName: newNameRoom,
+                roomName: newName,
             });
 
             await newRoom.save();
