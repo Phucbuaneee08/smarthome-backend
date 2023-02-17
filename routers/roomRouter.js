@@ -10,10 +10,10 @@ const router = express.Router()
 // route.delete('/:roomId/:deviceId',removeDevice)
 
 //create room
-router.post('/api/room/create-room', roomController.createRoom);
+router.post('/api/room/create', roomController.createRoom);
 
 //delete room
-router.delete('/api/room/delete-room', roomController.deleteRoom);
+router.delete('/api/room/delete', roomController.deleteRoom);
 
 //update room data
 router.put('/api/room/update', roomController.updateRoomData);

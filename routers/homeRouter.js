@@ -6,10 +6,10 @@ const router = express.Router()
 // router.delete('/deleteroom/:homeId/:roomId',deleteRoom)
 
 //create home
-router.post('/api/home/create-home', homeController.createHome);
+router.post('/api/home/create', homeController.createHome);
 
 //delete home
-router.delete('/api/home/delete-home', homeController.deleteHome);
+router.delete('/api/home/delete', homeController.deleteHome);
 
 //update home data
 router.put('/api/home/update', homeController.updateHomeData);
