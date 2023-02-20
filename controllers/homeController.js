@@ -164,6 +164,7 @@ const homeController = {
             const accessToken = req.headers.authorization.split(" ")[1];
 
             // Đầu vào: chỉ cần accessToken
+            const { q } = req.query;
             const account = await Account.findOne({
                 accessToken: accessToken,
             });
@@ -177,6 +178,7 @@ const homeController = {
             // Lọc những nhà không trong danh sách đã sở hữu hoặc đang yêu cầu của tài khoản
             const otherHomesList = await Home.find({
                 "accountList._id": { $ne: account._id },
+                name:{$regex: '.*' + q + '.*'},
             });
 
             // Trả về danh sách các nhà không liên quan
