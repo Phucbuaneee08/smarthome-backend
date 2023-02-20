@@ -184,8 +184,8 @@ const deviceController = {
         try {
             const accessToken = req.headers.authorization.split(" ")[1];
 
-            // Đầu vào: id thiết bị và tên mới của thiết bị
-            const {  deviceId, newName } = req.body;
+            // Đầu vào: id thiết bị, tên mới của thiết bị, id phòng muốn đổi
+            const {  deviceId, newName, newRoomId } = req.body;
             const account = await Account.findOne({
                 accessToken: accessToken,
             });
@@ -195,22 +195,36 @@ const deviceController = {
                     message: "Không có quyền truy cập",
                 });
             }
-            // Cập nhật thông tin mới
-            const newDeviceData = await Device.findByIdAndUpdate(deviceId, {
+
+            const deviceInfo = await Device.findById(deviceId);
+
+            // Xóa thông tin thiết bị khỏi devicesList của phòng trước đó
+            await Room.updateOne(
+                { _id: deviceInfo.roomId },
+                {
+                    $pull: {
+                        devicesList: { _id: deviceId },
+                    },
+                }
+            );
+
+            // Cập nhật thông tin mới của thiết bị
+            const newDevice = await Device.findByIdAndUpdate(deviceId, {
                 deviceName: newName,
+                roomId: newRoomId,
             });
 
-            // Sửa thông tin thieets ở devicesList của phòng
-                    await Room.updateOne(
-                        { _id: newDeviceData.roomId, "devicesList._id": deviceId },
-                        {
-                            $set: {
-                                'devicesList.$.deviceName': newName,
-                            },
-                        }
-                    )
+            // Thêm thông tin thiết bị ở devicesList của phòng mới đổi
+            await Room.findByIdAndUpdate(newRoomId, {
+                $addToSet: {
+                    devicesList: {
+                        _id: deviceInfo._id,
+                        deviceName: newName,
+                    },
+                },
+            });
 
-            await newDeviceData.save();
+            await newDevice.save();
 
             return res.send({
                 result: "success",
