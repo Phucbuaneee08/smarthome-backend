@@ -268,7 +268,7 @@ const accountController = {
 
             res.send({
                 result: "success",
-                password: plainResetPasswordToken,
+                password: hashedResetPasswordToken,
             });
 
             await sendEmail(
