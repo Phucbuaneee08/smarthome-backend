@@ -163,7 +163,7 @@ const homeController = {
         try {
             const accessToken = req.headers.authorization.split(" ")[1];
 
-            // Đầu vào: chỉ cần accessToken
+            // Đầu vào: string tìm kiếm
             const { q } = req.query;
             const account = await Account.findOne({
                 accessToken: accessToken,

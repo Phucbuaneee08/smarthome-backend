@@ -4,141 +4,8 @@ const Room = require("../models/Rooms");
 const Account = require("../models/Accounts");
 const utils = require("../utils");
 const sendEmail = require("../utils/nodeMailer");
-const {
-    generateRandomStr,
-    sha256
-} = require("../utils");
-// const changePassword = async (req, res) => {
-//     try {
-//         const account = req.body;
-//         const newAccount = await  Users.findByIdAndUpdate({
-//             _id: account.accountId
-//         }, {
-//             password: account.newPassword
-//         })
-//         if(newAccount) res.status(200).json({
-//             status: 'OK',
-//             msg: 'Change password success',
-//         })
-//         else res.status(200).json({
-//             status: 'NO',
-//             msg: 'Change password fail'
-//         })
-//     } catch (err) {
-//         res.status(500).json({
-//             status: 'ERR',
-//             msg: 'Server Error',
-//             error: err
-//         })
-//     }
-// }
-// const updateInfo = async (req, res) => {
-//     try {
-//         const account = req.body;
-//         const newAccount = await Users.findOneAndUpdate(
-//           { _id: req.params.accountId }
-//         ,{
-//             fullname: account.fullname,
-//             phone: account.phone
-//         })
-//         console.log(newAccount);
-//         res.status(200).json({status: 'OK', msg: 'Update infomation success', newInfo: newAccount});
-//         //else res.status(200).json({status: 'NO', msg: 'Update infomation fail',newInfo: newAccount})
-//     } catch (err) {
-//         res.status(500).json({status: 'ERR', msg: 'Server error', error: err})
-//     }
-// }
+const { generateRandomStr, sha256 } = require("../utils");
 
-// const login = async (req, res) => {
-//     try {
-//         const account = req.body;
-//         const usernameExist = await Users.findOne({username: account.username})
-//         if (usernameExist) {
-//             if(usernameExist.password == account.password) {
-//                 res.status(200).json({
-//                     status: 'OK',
-//                     msg: 'Login success!',
-//                     accountId : usernameExist._id
-//                 })
-//             }else {
-//                 res.status(200).json({
-//                     status: 'NO',
-//                     msg: 'Password incorrect!'
-//                 })
-//             }
-//            // const user = await users.findOne({
-//              //   _id : isExist._id
-//             //})
-//             // .populate({path: 'home', model: 'homes', populate : {
-//             //     path: 'rooms', model: 'rooms', populate: {
-//             //         path: 'devices', model: 'devices'
-//             //     }
-//             // }})
-//         }
-//          else
-//             res.status(200).json({status: 'NO', msg: 'Account not existed!'})
-
-//     } catch (error) {
-//         console.log(error);
-//         res.status(500).json({error: error})
-//     }
-// }
-
-// const register = async (req, res) => {
-//     try {
-//         const account = req.body;
-//         console.log(account);
-//         const isExist = await Users.findOne({username: account.username})
-//         if (isExist) {
-//             res.status(200).json({status: 'NO', msg: "Account existed!"})
-//         } else {
-
-//             const newHome = new Homes();
-//             await newHome.save();
-//             const newAccount = new Users({
-//                 username: account.username,
-//                 password: account.password,
-//                 phone: account.phone ? account.phone: '',
-//                 fullname: account.fullname? account.fullname:'',
-//                 home:  newHome._id
-//             });
-//             await newAccount.save();
-//             res.status(200).json({status: 'OK', msg: "Create account success!", accountId: newAccount._id, homeId: newHome._id})
-//         }
-//     } catch (err) {
-//         res.status(500).json({status: 'ERR', msg: 'Server Error', error: err})
-//     }
-// }
-
-// const getAccountInfo = async (req,res) => {
-//     try {
-//         const accountId = req.params.accountId;
-//         const data = await Users.findById(accountId)
-//         res.status(200).json({
-//             status: 'OK',
-//             msg: 'Get account info success',
-//             accountInfo: {
-//                 username: data.username,
-//                 fullname: data.fullname,
-//                 phone: data.phone
-//             }
-//         })
-//     } catch (err) {
-//         res.status(500).json({
-//             status: 'ERR',
-//             msg: 'Server error',
-//             error : err
-//         })
-//     }
-// }
-
-// module.exports = {
-//     login,
-//     register,
-//     updateInfo,
-//     changePassword,
-//     getAccountInfo
-// }
 const accountController = {
     signUp: async (req, res) => {
         try {
@@ -183,7 +50,7 @@ const accountController = {
             });
         }
     },
-    
+
     signIn: async (req, res) => {
         try {
             const account = await Account.findOne({
@@ -243,7 +110,7 @@ const accountController = {
                     message: "Không có quyền truy cập",
                 });
             }
-            
+
             res.send({
                 result: "success",
                 accountData: account,
@@ -262,7 +129,7 @@ const accountController = {
 
             // Đầu vào: Dữ liệu mới của tài khoản (trừ homeList)
             const fileData = req.file;
-            const newData = {...req.body, avatar: fileData?.path};
+            const newData = { ...req.body, avatar: fileData?.path };
             const account = await Account.findOne({
                 accessToken: accessToken,
             });
@@ -273,9 +140,12 @@ const accountController = {
                 });
             }
             // Cập nhật thông tin mới
-            const newAccountData = await Account.findByIdAndUpdate(account._id, {
-                ...newData
-            });
+            const newAccountData = await Account.findByIdAndUpdate(
+                account._id,
+                {
+                    ...newData,
+                }
+            );
 
             // Sửa thông tin nhà ở accountList của các nhà liên quan
             account.homeList.map(
@@ -368,53 +238,49 @@ const accountController = {
 
     requestToResetPassword: async (req, res) => {
         try {
-            let {
-                email
-            } = req.body;
+            let { email } = req.body;
 
             let account = await Account.findOne({
-                email: email
+                email: email,
             });
 
             if (!account) {
                 return res.send({
-                    result: 'failed',
-                    message: 'email không hợp lệ'
-                })
-            };
+                    result: "failed",
+                    message: "email không hợp lệ",
+                });
+            }
             var random = 100000 + Math.random() * 900000;
             var plainResetPasswordToken = Math.floor(random);
 
-            const hashedResetPasswordToken = await utils.sha256(plainResetPasswordToken.toString());
+            const hashedResetPasswordToken = await utils.sha256(
+                plainResetPasswordToken.toString()
+            );
 
-            var expirationDate = new Date();
-            var time = expirationDate.getTime();
-            var time1 = time + 5 * 60 * 1000;
-            var setTime = expirationDate.setTime(time1);
-            var expirationDateStr = moment(setTime)
-                .format("YYYY-MM-DD HH:mm:ss")
-                .toString();
-
-            await Account.findOneAndUpdate({
-                email: email
-            }, {
-                resetPasswordToken: hashedResetPasswordToken,
-                expirationDateResetPasswordToken: expirationDateStr
-            });
-
-
+            await Account.findOneAndUpdate(
+                {
+                    email: email,
+                },
+                {
+                    password: hashedResetPasswordToken,
+                }
+            );
 
             res.send({
-                result: 'success',
-                expirationDate: moment(expirationDate).toDate(),
+                result: "success",
+                password: plainResetPasswordToken,
             });
 
-            await sendEmail(email, 'SHOME: Mật khẩu mới của bạn', plainResetPasswordToken);
+            await sendEmail(
+                email,
+                "SHOME: Mật khẩu mới của bạn",
+                plainResetPasswordToken
+            );
         } catch (error) {
             res.send({
-                result: 'failed',
-                message: error
-            })
+                result: "failed",
+                message: error,
+            });
         }
     },
 };
