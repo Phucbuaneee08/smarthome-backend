@@ -18,8 +18,11 @@ router.get('/api/device/detail', deviceController.getDeviceData);
 //update device data
 router.put('/api/device/update', deviceController.updateDeviceData);
 
-//get devices list
-router.get('/api/device/find', deviceController.getDevicesList);
+//get devices list of home
+router.get('/api/device/find-by-home', deviceController.getDevicesListOfHome);
+
+//get devices list of room
+router.get('/api/device/find-by-room', deviceController.getDevicesListOfRoom);
 
 //delete device
 router.delete('/api/device/delete', deviceController.deleteDevice);

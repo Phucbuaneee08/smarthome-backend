@@ -185,7 +185,7 @@ const deviceController = {
             const accessToken = req.headers.authorization.split(" ")[1];
 
             // Đầu vào: id thiết bị, tên mới của thiết bị, id phòng muốn đổi
-            const {  deviceId, newName, newRoomId } = req.body;
+            const { deviceId, newName, newRoomId } = req.body;
             const account = await Account.findOne({
                 accessToken: accessToken,
             });
@@ -228,7 +228,7 @@ const deviceController = {
 
             return res.send({
                 result: "success",
-                message : "Cập nhật thành công"
+                message: "Cập nhật thành công",
             });
         } catch (error) {
             res.send({
@@ -238,11 +238,39 @@ const deviceController = {
         }
     },
 
-    getDevicesList: async (req, res) => {
+    getDevicesListOfRoom: async (req, res) => {
         try {
             const accessToken = req.headers.authorization.split(" ")[1];
 
-            // Đầu vào: homeId hoặc để trống
+            // Đầu vào: roomId
+            const { roomId } = req.query;
+            const account = await Account.findOne({
+                accessToken: accessToken,
+            });
+            if (!account) {
+                return res.send({
+                    result: "failed",
+                    message: "Không có quyền truy cập",
+                });
+            }
+
+            const devicesList = await Device.find({ roomId: roomId });
+            return res.send({
+                result: "success",
+                devicesListOfRoom: devicesList,
+            });
+        } catch (error) {
+            res.send({
+                result: "failed",
+                message: error,
+            });
+        }
+    },
+    getDevicesListOfHome: async (req, res) => {
+        try {
+            const accessToken = req.headers.authorization.split(" ")[1];
+
+            // Đầu vào: homeId
             const { homeId } = req.query;
             const account = await Account.findOne({
                 accessToken: accessToken,
@@ -253,35 +281,20 @@ const deviceController = {
                     message: "Không có quyền truy cập",
                 });
             }
-            if (homeId) {
-                // let DevicesOfHome = [];
-                // const currentHome = await Home.findById(homeId);
-                //     for (let i = 0; i < currentHome.roomsList.length; i++) {
-                //         let DevicesOfRoom = await Device.find({
-                //             roomId: currentHome.roomsList[i]._id,
-                //         });
-                //         DevicesOfHome = DevicesOfHome.concat(DevicesOfRoom);
-                //     }
-                const roomsList = await Room.find({ homeId: homeId });
-                let devicesList = [];
-                for (let i = 0; i < roomsList.length; i++) {
-                    devicesList = devicesList.concat(
-                        await Device.find({ roomId: roomsList[i]._id })
-                    );
-                }
-                // Trả về danh sách các thiết bị
-                return res.send({
-                    result: "success",
-                    devicesList: devicesList,
-                });
-            } else {
-                const AllDevices = await Device.find();
-                // Trả về danh sách tất cả các thiết bị
-                return res.send({
-                    result: "success",
-                    AllDevices: AllDevices,
-                });
+
+            const roomsList = await Room.find({ homeId: homeId });
+            let devicesList = [];
+            for (let i = 0; i < roomsList.length; i++) {
+                devicesList = devicesList.concat(
+                    await Device.find({ roomId: roomsList[i]._id })
+                );
             }
+
+            // Trả về danh sách các thiết bị
+            return res.send({
+                result: "success",
+                devicesListOfHome: devicesList,
+            });
         } catch (error) {
             res.send({
                 result: "failed",
