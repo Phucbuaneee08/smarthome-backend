@@ -3,6 +3,7 @@
 const Account = require("../models/Accounts");
 const Home = require("../models/Homes");
 const Room = require("../models/Rooms");
+const Device = require("../models/Devices");
 
 // const getTemperature = async (req,res) => {
 //     try {
@@ -275,11 +276,16 @@ const roomController = {
                 });
             }
             const roomData = await Room.findById(roomId);
-            
+            const devicesList = await Device.find({roomId: roomId});
+            // roomInfo.devicesList = [...devicesList];
             // Trả về thông tin chi tiết căn phòng
             return res.send({
                 result: "success",
-                roomData: roomData,
+                roomData: {
+                    _id: roomData._id,
+                    roomName: roomData.roomName,
+                    devicesList: devicesList,
+                },
             });
         } catch (error) {
             res.send({
