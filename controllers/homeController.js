@@ -117,7 +117,7 @@ const homeController = {
             const accessToken = req.headers.authorization.split(" ")[1];
 
             // Đầu vào: Id của căn nhà
-            const { homeId } = req.body;
+            const { homeId } = req.query;
             const account = await Account.findOne({
                 accessToken: accessToken,
             });
