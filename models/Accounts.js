@@ -31,6 +31,10 @@ const accounts = new Schema(
         username: String,
         password: String,
         fullname: String,
+        role: {
+                type: String,
+                default: 'USER'
+            },
         phone: String,
         email: String,
         avatar: String,

@@ -22,6 +22,9 @@ router.put('/api/account/update', uploadCloud.single('avatar') , accountControll
 //sign in
 router.post('/api/account/sign-in', accountController.signIn);
 
+//admin sign in
+router.post('/api/admin-account/sign-in', accountController.adminSignIn);
+
 //sign out
 router.post('/api/account/sign-out',  accountController.signOut);
 

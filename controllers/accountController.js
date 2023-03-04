@@ -55,6 +55,7 @@ const accountController = {
         try {
             const account = await Account.findOne({
                 username: req.body.username,
+                role: 'USER'
             });
 
             if (!account) {
@@ -280,6 +281,52 @@ const accountController = {
             res.send({
                 result: "failed",
                 message: error,
+            });
+        }
+    },
+    adminSignIn: async (req, res) => {
+        try {
+            const account = await Account.findOne({
+                username: req.body.username,
+                role: 'ADMIN'
+            });
+
+            if (!account) {
+                return res.status(404).json({
+                    result: "success",
+                    message: "Tài khoản không đúng",
+                });
+            }
+
+            const hashed = await utils.sha256(req.body.password);
+            const validPassword = hashed === account.password;
+
+            if (!validPassword) {
+                return res.status(404).json({
+                    result: "failed",
+                    message: "Sai mật khẩu",
+                });
+            }
+
+            if (!account.accessToken) {
+                var accessToken = generateRandomStr(32);
+
+                await account.updateOne({
+                    accessToken: accessToken,
+                });
+            }
+            const responseAccount = await Account.findOne({
+                _id: account._id,
+            });
+
+            return res.send({
+                result: "success",
+                account: responseAccount.toJSON(),
+            });
+        } catch (err) {
+            res.status(500).json({
+                result: "failed",
+                error: err,
             });
         }
     },
