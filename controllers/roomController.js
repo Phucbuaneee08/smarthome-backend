@@ -244,6 +244,9 @@ const roomController = {
                 }
             );
 
+            // Xóa các thiết bị của phòng khỏi database
+            await Device.deleteMany({roomId: roomId});
+
             // Xóa phòng khỏi database
             await Room.findByIdAndDelete(roomId);
 

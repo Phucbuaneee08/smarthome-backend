@@ -5,6 +5,8 @@
 // const { findByIdAndUpdate, findById } = require("../models/Devices");
 const Account = require("../models/Accounts");
 const Home = require("../models/Homes");
+const Room = require("../models/Rooms");
+const Device = require("../models/Devices");
 
 // const getHomeData = async (req, res) => {
 
@@ -143,6 +145,14 @@ const homeController = {
                         }
                     )
             );
+
+            // Xóa các thiết bị trong nhà khỏi database
+            home.roomsList.map(
+                async (item) => await Device.deleteMany({ roomId: item._id })
+            );
+
+            // Xóa các phòng trong nhà khỏi database
+            await Room.deleteMany({ homeId: home._id })
 
             // Xóa nhà khỏi database
             await Home.findByIdAndDelete(homeId);
