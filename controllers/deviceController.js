@@ -394,23 +394,19 @@ const deviceController = {
     getTemperature: async (req, res) => {
         try {
             const { deviceId } = req.query;
-            var value;
+            var data;
             const deviceData = await Device.findById(deviceId);
             console.log(deviceData);
-            // if (device.deviceType === "Cảm biến nhiệt độ và độ ẩm") {
-            //     // value = device.value[device.value.length - 1];
-            //     value = device.value;
-            // }
-                console.log(value);
-            // if (device.deviceType == "temperature-celsius") {
-            //     var data = device.data;
-            //     value = data[data.length - 1];
-            //     console.log(value);
-            // }
+            if (deviceData.deviceType === "Cảm biến nhiệt độ") {
+                // value = device.value[device.value.length - 1];
+                data = deviceData.data;
+            }
+                console.log(data);
+            
             res.status(200).json({
                 status: "OK",
                 msg: "Get room temperature success",
-                temperature: value,
+                temperature: data,
             });
         } catch (err) {
             res.status(500).json({
