@@ -12,7 +12,7 @@ const deviceRouter = require("./routers/deviceRouter");
 // const statis = require('./routers/statics')
 const app = express();
 const connection = require("./connection");
-// const { connectMQTT } = require("./mqtt");
+const { connectMQTT } = require("./mqtt");
 
 const corsOpts = {
     origin: "*",
@@ -44,7 +44,7 @@ app.use(
 
 // connect database
 connection();
-// connectMQTT();
+connectMQTT();
 
 app.get("/", (req, res) => {
     res.send("SUCCESS");

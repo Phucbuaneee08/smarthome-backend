@@ -1,9 +1,9 @@
-// const mqtt = require("mqtt");
-// const broker = "mqtt://broker.hivemq.com:1883";
-// const topic = "/control_IOT";
+const mqtt = require("mqtt");
+const broker = "mqtt://broker.hivemq.com:1883";
+const topic = "/control_IOT";
 const Device = require("../models/Devices");
-// const options = {};
-// const client = mqtt.connect(broker, options);
+const options = {};
+const client = mqtt.connect(broker, options);
 const Room = require("../models/Rooms");
 const Account = require("../models/Accounts");
 
@@ -345,19 +345,109 @@ const deviceController = {
             });
         }
     },
-    // updateData: async (data) => {
-    //     try {
-    //         const device = await Devices.findByIdAndUpdate(data.deviceId, {
-    //             $push: {
-    //                 data: {
-    //                     value: data.value,
-    //                 },
-    //             },
-    //         });
-    //     } catch (err) {
-    //         console.log(err);
-    //     }
-    // },
+    updateData: async (data) => {
+        try {
+            const device = await Device.findByIdAndUpdate(data.deviceId, {
+                $push: {
+                    value: data.value,
+                },
+            });
+        } catch (err) {
+            console.log(err);
+        }
+    },
+    controlDevice: async (req, res) => {
+        try {
+            const { deviceId, ...control } = req.body;
+
+            console.log("deviceid: ", deviceId);
+            console.log("control: ", control.control);
+            await Device.findByIdAndUpdate(deviceId, {
+                control: { ...control.control },
+            });
+            // client.on('connect', () => {
+            // console.log('Connected broker')
+            client.publish(
+                topic,
+                JSON.stringify({
+                    deviceId: deviceId,
+                    control: { ...control.control },
+                }),
+                (err) => {
+                    if (err) console.log("MQTT publish error: ", err);
+                    else console.log("Published!");
+                }
+            );
+            // })
+            console.log(control);
+            res.status(200).json({
+                status: "OK",
+                msg: "Send control signal success!",
+                control: control.control,
+            });
+        } catch (err) {
+            res.status(500).json({
+                status: "ERR",
+                msg: "Server Error!",
+                error: err,
+            });
+        }
+    },
+    getTemperature: async (req, res) => {
+        try {
+            const { deviceId } = req.query;
+            var value;
+            if(deviceId == "63f84faa0e84f847174ac852"){
+                const device = Device.findById(deviceId);
+                value = device.value[device.value.length - 1];
+                console.log(value);
+            }
+            // if (device.deviceType == "temperature-celsius") {
+            //     var data = device.data;
+            //     value = data[data.length - 1];
+            //     console.log(value);
+            // }
+            res.status(200).json({
+                status: "OK",
+                msg: "Get room temperature success",
+                temperature: value,
+            });
+        } catch (err) {
+            res.status(500).json({
+                status: "ERR",
+                msg: "Server error",
+                error: err,
+            });
+        }
+    },
+
+    getHumidity: async (req, res) => {
+        try {
+            const { deviceId } = req.query;
+            var value;
+            if(deviceId == "6403fb329df38ebe87f2fff3"){
+                const device = Device.findById(deviceId);
+                value = device.value[device.value.length - 1];
+                console.log(value);
+            }
+            // if (device.deviceType == "temperature-celsius") {
+            //     var data = device.data;
+            //     value = data[data.length - 1];
+            //     console.log(value);
+            // }
+            res.status(200).json({
+                status: "OK",
+                msg: "Get room humidity success",
+                humidity: value,
+            });
+        } catch (err) {
+            res.status(500).json({
+                status: "ERR",
+                msg: "Server error",
+                error: err,
+            });
+        }
+    },
 };
 // module.exports = {
 //     getData,control,createDevice, deleteDevice, getDevice, updateData

@@ -27,6 +27,15 @@ router.get('/api/device/find-by-room', deviceController.getDevicesListOfRoom);
 //delete device
 router.delete('/api/device/delete', deviceController.deleteDevice);
 
+//get temperature
+router.get('/api/device/temperature',deviceController.getTemperature);
+
+//get humidity
+router.get('/api/device/humidity',deviceController.getHumidity);
+
+//control device
+router.post('/api/device/control', deviceController.controlDevice);
+
 // //control device
 // router.put('/api/device/control', deviceController.controlDevice);
 

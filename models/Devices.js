@@ -20,18 +20,18 @@ const devices = mongoose.Schema(
                 type: Boolean,
                 default: false,
             },
-            mode: {
-                type: String,
-                default: "1",
-            },
-            direction: {
-                type: Number,
-                default: 0,
-            },
-            speed: {
-                type: Number,
-                default: 0,
-            },
+            // mode: {
+            //     type: String,
+            //     default: "1",
+            // },
+            // direction: {
+            //     type: Number,
+            //     default: 0,
+            // },
+            // speed: {
+            //     type: Number,
+            //     default: 0,
+            // },
             intensity: {
                 type: Number,
                 default: 0,
