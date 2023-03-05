@@ -348,6 +348,7 @@ const accountController = {
 
             // Lọc danh sách người dùng
             const usersList = await Account.find({
+                role:  "USER",
                 fullname: { $regex: ".*" + q + ".*" },
             });
 
