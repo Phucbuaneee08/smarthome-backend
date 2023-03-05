@@ -266,6 +266,7 @@ const deviceController = {
             });
         }
     },
+    
     getDevicesListOfHome: async (req, res) => {
         try {
             const accessToken = req.headers.authorization.split(" ")[1];
@@ -439,6 +440,47 @@ const deviceController = {
                 status: "ERR",
                 msg: "Server error",
                 error: err,
+            });
+        }
+    },
+
+    getDevicesListOfAdmin: async (req, res) => {
+        try {
+            const accessToken = req.headers.authorization.split(" ")[1];
+
+            // Đầu vào: string tìm kiếm
+            const { q } = req.query;
+            const account = await Account.findOne({
+                accessToken: accessToken,
+            });
+            if (!account || account.role !== "ADMIN") {
+                return res.send({
+                    result: "failed",
+                    message: "Không có quyền truy cập",
+                });
+            }
+
+            // Lọc danh sách thiết bị của hệ thống
+            const devicesList = await Device.find({
+                deviceType: { $regex: ".*" + q + ".*" },
+            });
+
+            // Trả về danh sách thiết bị
+            if (devicesList.length > 0) {
+                return res.send({
+                    result: "success",
+                    devicesList: devicesList,
+                });
+            } else {
+                return res.send({
+                    result: "failed",
+                    message: "Danh sách rỗng",
+                });
+            }
+        } catch (error) {
+            res.send({
+                result: "failed",
+                message: error,
             });
         }
     },

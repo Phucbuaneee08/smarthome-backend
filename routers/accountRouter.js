@@ -32,6 +32,9 @@ router.post('/api/account/sign-out',  accountController.signOut);
 router.put('/api/account/change-password', accountController.changePassword);
 
 //request to reset password
-router.post('/api/account/request-reset-password', accountController.requestToResetPassword)
+router.post('/api/account/request-reset-password', accountController.requestToResetPassword);
+
+//get users list of admin
+router.get('/api/account/find', accountController.getUsersListOfAdmin);
 
 module.exports = router;

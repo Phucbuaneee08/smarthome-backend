@@ -330,6 +330,46 @@ const accountController = {
             });
         }
     },
+    getUsersListOfAdmin: async (req, res) => {
+        try {
+            const accessToken = req.headers.authorization.split(" ")[1];
+
+            // Đầu vào: string tìm kiếm
+            const { q } = req.query;
+            const account = await Account.findOne({
+                accessToken: accessToken,
+            });
+            if (!account || account.role !== "ADMIN") {
+                return res.send({
+                    result: "failed",
+                    message: "Không có quyền truy cập",
+                });
+            }
+
+            // Lọc danh sách người dùng
+            const usersList = await Account.find({
+                fullname: { $regex: ".*" + q + ".*" },
+            });
+
+            // Trả về danh sách người dùng
+            if (usersList.length > 0) {
+                return res.send({
+                    result: "success",
+                    usersList: usersList,
+                });
+            } else {
+                return res.send({
+                    result: "failed",
+                    message: "Danh sách rỗng",
+                });
+            }
+        } catch (error) {
+            res.send({
+                result: "failed",
+                message: error,
+            });
+        }
+    },
 };
 
 module.exports = accountController;

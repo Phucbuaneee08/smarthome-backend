@@ -36,6 +36,9 @@ router.get('/api/device/humidity',deviceController.getHumidity);
 //control device
 router.post('/api/device/control', deviceController.controlDevice);
 
+//get devices list of admin
+router.get('/api/device/find', deviceController.getDevicesListOfAdmin);
+
 // //control device
 // router.put('/api/device/control', deviceController.controlDevice);
 
