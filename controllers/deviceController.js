@@ -348,9 +348,7 @@ const deviceController = {
     updateData: async (data) => {
         try {
             const device = await Device.findByIdAndUpdate(data.deviceId, {
-                $push: {
                     value: data.value,
-                },
             });
         } catch (err) {
             console.log(err);
@@ -397,11 +395,13 @@ const deviceController = {
         try {
             const { deviceId } = req.query;
             var value;
-            if(deviceId == "63f84faa0e84f847174ac852"){
-                const device = Device.findById(deviceId);
-                value = device.value[device.value.length - 1];
+            const deviceData = await Device.findById(deviceId);
+            console.log(deviceData);
+            // if (device.deviceType === "Cảm biến nhiệt độ và độ ẩm") {
+            //     // value = device.value[device.value.length - 1];
+            //     value = device.value;
+            // }
                 console.log(value);
-            }
             // if (device.deviceType == "temperature-celsius") {
             //     var data = device.data;
             //     value = data[data.length - 1];
@@ -425,9 +425,10 @@ const deviceController = {
         try {
             const { deviceId } = req.query;
             var value;
-            if(deviceId == "6403fb329df38ebe87f2fff3"){
+            if (deviceId == "6403fb329df38ebe87f2fff3") {
                 const device = Device.findById(deviceId);
-                value = device.value[device.value.length - 1];
+                // value = device.value[device.value.length - 1];
+                value = device.value;
                 console.log(value);
             }
             // if (device.deviceType == "temperature-celsius") {

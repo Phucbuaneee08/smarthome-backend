@@ -14,7 +14,10 @@ const devices = mongoose.Schema(
             type: mongoose.SchemaTypes.ObjectId,
             ref: "rooms",
         },
-        value: String,
+        value: {
+            type: String,
+            default: "",
+        },
         control: {
             status: {
                 type: Boolean,
