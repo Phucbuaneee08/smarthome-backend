@@ -348,7 +348,7 @@ const deviceController = {
     updateData: async (data) => {
         try {
             const device = await Device.findByIdAndUpdate(data.deviceId, {
-                    value: data.value,
+                    data: data.data,
             });
         } catch (err) {
             console.log(err);
@@ -360,7 +360,7 @@ const deviceController = {
 
             console.log("deviceid: ", deviceId);
             console.log("control: ", control.control);
-            await Device.findByIdAndUpdate(deviceId, {
+            const currentDevice = await Device.findByIdAndUpdate(deviceId, {
                 control: { ...control.control },
             });
             // client.on('connect', () => {
@@ -381,7 +381,7 @@ const deviceController = {
             res.status(200).json({
                 status: "OK",
                 msg: "Send control signal success!",
-                control: control.control,
+                currentDevice: currentDevice,
             });
         } catch (err) {
             res.status(500).json({
@@ -420,22 +420,19 @@ const deviceController = {
     getHumidity: async (req, res) => {
         try {
             const { deviceId } = req.query;
-            var value;
-            if (deviceId == "6403fb329df38ebe87f2fff3") {
-                const device = Device.findById(deviceId);
+            var data;
+            const deviceData = await Device.findById(deviceId);
+            console.log(deviceData);
+            if (deviceData.deviceType === "Cảm biến độ ẩm") {
                 // value = device.value[device.value.length - 1];
-                value = device.value;
-                console.log(value);
+                data = deviceData.data;
             }
-            // if (device.deviceType == "temperature-celsius") {
-            //     var data = device.data;
-            //     value = data[data.length - 1];
-            //     console.log(value);
-            // }
+                console.log(data);
+            
             res.status(200).json({
                 status: "OK",
                 msg: "Get room humidity success",
-                humidity: value,
+                humidity: data,
             });
         } catch (err) {
             res.status(500).json({
