@@ -427,7 +427,7 @@ const accountController = {
             });
         }
     },
-    
+
     deleteUserOfAdmin: async (req, res) => {
         try {
             // accessToken của admin
@@ -455,7 +455,7 @@ const accountController = {
                 })
             );
 
-            await Account.deleteOne({_id: userId});
+            await Account.deleteMany({_id: userId});
 
             // Trả về
             return res.send({
