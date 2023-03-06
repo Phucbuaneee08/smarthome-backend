@@ -55,7 +55,7 @@ const accountController = {
         try {
             const account = await Account.findOne({
                 username: req.body.username,
-                role: 'USER'
+                role: "USER",
             });
 
             if (!account) {
@@ -187,7 +187,7 @@ const accountController = {
             const account = await Account.findOne({
                 accessToken: accessToken,
             });
-            if (!account || account.role !== 'ADMIN') {
+            if (!account || account.role !== "ADMIN") {
                 return res.send({
                     result: "failed",
                     message: "Không có quyền truy cập",
@@ -205,7 +205,10 @@ const accountController = {
             newAccountData.homeList.map(
                 async (item) =>
                     await Home.updateOne(
-                        { _id: item._id, "accountList._id": newAccountData._id },
+                        {
+                            _id: item._id,
+                            "accountList._id": newAccountData._id,
+                        },
                         {
                             $set: {
                                 "accountList.$.fullname": newData.fullname,
@@ -341,7 +344,7 @@ const accountController = {
         try {
             const account = await Account.findOne({
                 username: req.body.username,
-                role: 'ADMIN'
+                role: "ADMIN",
             });
 
             if (!account) {
@@ -401,7 +404,7 @@ const accountController = {
 
             // Lọc danh sách người dùng
             const usersList = await Account.find({
-                role:  "USER",
+                role: "USER",
                 fullname: { $regex: ".*" + q + ".*" },
             });
 
@@ -417,6 +420,48 @@ const accountController = {
                     message: "Danh sách rỗng",
                 });
             }
+        } catch (error) {
+            res.send({
+                result: "failed",
+                message: error,
+            });
+        }
+    },
+    
+    deleteUserOfAdmin: async (req, res) => {
+        try {
+            // accessToken của admin
+            const accessToken = req.headers.authorization.split(" ")[1];
+
+            // Đầu vào: id tài khoản đang bị xóa
+            const { userId } = req.query;
+            const account = await Account.findOne({
+                accessToken: accessToken,
+            });
+            if (!account || account.role !== "ADMIN") {
+                return res.send({
+                    result: "failed",
+                    message: "Không có quyền truy cập",
+                });
+            }
+
+            // Xóa thông tin tài khoản bị xóa khỏi accountList của các căn nhà
+            const deleteUser = await Account.findById(userId);
+            deleteUser.homeList.map((home) =>
+                Home.findByIdAndUpdate(home._id, {
+                    $pull: {
+                        accountList: { _id: userId },
+                    },
+                })
+            );
+
+            await Account.deleteOne({_id: userId});
+
+            // Trả về
+            return res.send({
+                result: "success",
+                message: "Xóa thành công!",
+            });
         } catch (error) {
             res.send({
                 result: "failed",

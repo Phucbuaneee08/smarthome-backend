@@ -19,14 +19,8 @@ router.get('/api/account/detail', accountController.getAccountData);
 //update account data
 router.put('/api/account/update', uploadCloud.single('avatar') , accountController.updateAccountData);
 
-//update account data of admin
-router.put('/api/account/update-user', uploadCloud.single('avatar') , accountController.updateAccountDataOfAdmin);
-
 //sign in
 router.post('/api/account/sign-in', accountController.signIn);
-
-//admin sign in
-router.post('/api/admin-account/sign-in', accountController.adminSignIn);
 
 //sign out
 router.post('/api/account/sign-out',  accountController.signOut);
@@ -37,7 +31,16 @@ router.put('/api/account/change-password', accountController.changePassword);
 //request to reset password
 router.post('/api/account/request-reset-password', accountController.requestToResetPassword);
 
+//admin sign in
+router.post('/api/admin-account/sign-in', accountController.adminSignIn);
+
 //get users list of admin
 router.get('/api/account/find', accountController.getUsersListOfAdmin);
+
+//update account data of admin
+router.put('/api/account/update-user', uploadCloud.single('avatar') , accountController.updateAccountDataOfAdmin);
+
+//delete user of admin
+router.get('/api/account/delete-user', accountController.deleteUserOfAdmin);
 
 module.exports = router;
