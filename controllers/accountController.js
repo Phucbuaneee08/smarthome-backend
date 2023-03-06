@@ -177,6 +177,59 @@ const accountController = {
         }
     },
 
+    updateAccountDataOfAdmin: async (req, res) => {
+        try {
+            const accessToken = req.headers.authorization.split(" ")[1];
+
+            // Đầu vào: Dữ liệu mới của tài khoản (trừ homeList)
+            const fileData = req.file;
+            const newData = { ...req.body, avatar: fileData?.path };
+            const account = await Account.findOne({
+                accessToken: accessToken,
+            });
+            if (!account || account.role !== 'ADMIN') {
+                return res.send({
+                    result: "failed",
+                    message: "Không có quyền truy cập",
+                });
+            }
+            // Cập nhật thông tin mới
+            const newAccountData = await Account.findByIdAndUpdate(
+                newData._id,
+                {
+                    ...newData,
+                }
+            );
+
+            // Sửa thông tin nhà ở accountList của các nhà liên quan
+            newAccountData.homeList.map(
+                async (item) =>
+                    await Home.updateOne(
+                        { _id: item._id, "accountList._id": newAccountData._id },
+                        {
+                            $set: {
+                                "accountList.$.fullname": newData.fullname,
+                                "accountList.$.avatar": newData.avatar,
+                            },
+                        }
+                    )
+            );
+
+            await newAccountData.save();
+
+            // Trả về thông tin mới của tài khoản
+            return res.send({
+                result: "success",
+                newAccountData: newAccountData,
+            });
+        } catch (error) {
+            res.send({
+                result: "failed",
+                message: error,
+            });
+        }
+    },
+
     signOut: async (req, res) => {
         try {
             const accessToken = req.headers.authorization.split(" ")[1];

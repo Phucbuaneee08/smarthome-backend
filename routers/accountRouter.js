@@ -19,6 +19,9 @@ router.get('/api/account/detail', accountController.getAccountData);
 //update account data
 router.put('/api/account/update', uploadCloud.single('avatar') , accountController.updateAccountData);
 
+//update account data of admin
+router.put('/api/account/update-user', uploadCloud.single('avatar') , accountController.updateAccountDataOfAdmin);
+
 //sign in
 router.post('/api/account/sign-in', accountController.signIn);
 
