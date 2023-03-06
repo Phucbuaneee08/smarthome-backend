@@ -41,6 +41,6 @@ router.get('/api/account/find', accountController.getUsersListOfAdmin);
 router.put('/api/account/update-user', uploadCloud.single('avatar') , accountController.updateAccountDataOfAdmin);
 
 //delete user of admin
-router.get('/api/account/delete-user', accountController.deleteUserOfAdmin);
+router.delete('/api/account/delete-user', accountController.deleteUserOfAdmin);
 
 module.exports = router;
