@@ -4,12 +4,6 @@ const accountController = require('../controllers/accountController')
 const uploadCloud =  require('../utils/cloudinary')
 
 
-// router.post('/login', login);
-// router.post('/', register);
-// router.post('/change-password',changePassword);
-// router.put('/:accountId',updateInfo);
-// router.get('/:accountId',getAccountInfo)
-// module.exports = router
 //sign up
 router.post('/api/account/sign-up', accountController.signUp);
 
@@ -29,7 +23,7 @@ router.post('/api/account/sign-out',  accountController.signOut);
 router.put('/api/account/change-password', accountController.changePassword);
 
 //request to reset password
-router.post('/api/account/request-reset-password', accountController.requestToResetPassword);
+// router.post('/api/account/request-reset-password', accountController.requestToResetPassword);
 
 //admin sign in
 router.post('/api/admin-account/sign-in', accountController.adminSignIn);

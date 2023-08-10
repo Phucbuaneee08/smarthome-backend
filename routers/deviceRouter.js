@@ -1,13 +1,8 @@
 const express = require('express')
-// const { control, deleteDevice, createDevice, getDevice, getData } = require('../controllers/deviceControl')
 const deviceController = require('../controllers/deviceController')
 const router = express.Router()
 
-// router.post('/control',control)
-// router.delete('/',deleteDevice)
-// router.post('/',createDevice)
-// router.get('/:deviceId',getDevice)
-// router.get('/:type/:roomId',getData)
+
 
 //create device
 router.post('/api/device/create', deviceController.createDevice);
@@ -27,22 +22,16 @@ router.get('/api/device/find-by-room', deviceController.getDevicesListOfRoom);
 //delete device
 router.delete('/api/device/delete', deviceController.deleteDevice);
 
-//get temperature
-router.get('/api/device/temperature',deviceController.getTemperature);
+//get temperature and humidity
+router.get('/api/device/temperature-humidity',deviceController.getTemperatureAndHumidity);
 
 //get humidity
-router.get('/api/device/humidity',deviceController.getHumidity);
+// router.get('/api/device/humidity',deviceController.getHumidity);
 
 //control device
 router.post('/api/device/control', deviceController.controlDevice);
 
 //get devices list of admin
 router.get('/api/device/find', deviceController.getDevicesListOfAdmin);
-
-// //control device
-// router.put('/api/device/control', deviceController.controlDevice);
-
-// //get device data
-// router.get('/api/device/detail', deviceController.getDeviceData);
 
 module.exports = router

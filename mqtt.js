@@ -1,5 +1,5 @@
 const mqtt = require("mqtt");
-const { updateData } = require("./controllers/deviceController");
+const { updateData, retrieveData } = require("./controllers/deviceController");
 
 const options = {
     // Clean session
@@ -9,7 +9,7 @@ const options = {
     // clientId: "74c1532c-df68-470f-9675-0df3aea06bf5",
 };
 const broker = "mqtt://broker.hivemq.com:1883";
-const topic = "datatest";
+const topic = "/data_device";
 
 const connectMQTT = () => {
     try {
@@ -20,9 +20,12 @@ const connectMQTT = () => {
         });
         client.on("message", (tp, msg) => {
             var data = JSON.parse(msg);
-
-            console.log("Received MQTT msg:", data);
-            updateData(data);
+            if (!data?.message) {
+                updateData(data);
+            } else
+                data?.message ===
+                    "Request to retrieve data of the device from the database" &&
+                    retrieveData();
         });
     } catch (err) {
         console.log(err);

@@ -1,111 +1,14 @@
 const mqtt = require("mqtt");
 const broker = "mqtt://broker.hivemq.com:1883";
-const topic = "/control_IOT";
+const topic = "/control_device";
 const Device = require("../models/Devices");
 const options = {};
 const client = mqtt.connect(broker, options);
 const Room = require("../models/Rooms");
 const Account = require("../models/Accounts");
+const pusher = require("../pusher");
 
 const deviceController = {
-    // getData: async (req, res) => {
-    //     try {
-    //         res.status(200).json({
-    //             status: "OK",
-    //             msg: "Get Data success",
-    //             value: value,
-    //         });
-    //     } catch (err) {
-    //         res.status(500).json({
-    //             status: "ERR",
-    //             msg: "Server Error",
-    //             error: err,
-    //         });
-    //     }
-    // },
-
-    // controlDevice: async (req, res) => {
-    //     try {
-    //         const { deviceId, ...control } = req.body;
-
-    //         console.log("deviceid: ", deviceId);
-    //         console.log("control: ", control.control);
-    //         await Devices.findByIdAndUpdate(deviceId, {
-    //             control: { ...control.control },
-    //         });
-    //         // client.on('connect', () => {
-    //         // console.log('Connected broker')
-    //         client.publish(
-    //             topic,
-    //             JSON.stringify({
-    //                 deviceId: deviceId,
-    //                 control: { ...control.control },
-    //             }),
-    //             (err) => {
-    //                 if (err) console.log("MQTT publish error: ", err);
-    //                 else console.log("Published!");
-    //             }
-    //         );
-    //         // })
-    //         console.log(control);
-    //         res.status(200).json({
-    //             status: "OK",
-    //             msg: "Send control signal success!",
-    //             control: control.control,
-    //         });
-    //     } catch (err) {
-    //         res.status(500).json({
-    //             status: "ERR",
-    //             msg: "Server Error!",
-    //             error: err,
-    //         });
-    //     }
-    // },
-    // getDeviceData: async (req, res) => {
-    //     try {
-    //         const deviceId = req.params.deviceId;
-    //         const device = await Devices.findById(deviceId);
-    //         res.status(200).json({
-    //             status: "OK",
-    //             msg: "Get device info success!",
-    //             deviceInfo: {
-    //                 deviceName: device.deviceName,
-    //                 deviceType: device.deviceType,
-    //                 control: device.control,
-    //             },
-    //         });
-    //     } catch (err) {
-    //         res.status(404).json({
-    //             status: "ERR",
-    //             msg: "Something wrong on server",
-    //             error: err,
-    //         });
-    //     }
-    // },
-
-    // createDevice: async (req, res) => {
-    //     try {
-    //         const { deviceInfo, roomId } = req.body;
-    //         const device = new Devices(deviceInfo);
-    //         await device.save();
-    //         await Room.findByIdAndUpdate(roomId, {
-    //             $push: {
-    //                 devices: device._id,
-    //             },
-    //         });
-    //         res.status(200).json({
-    //             status: "OK",
-    //             msg: "Create new device success!",
-    //             deviceId: device._id,
-    //         });
-    //     } catch (err) {
-    //         res.status(500).json({
-    //             status: "ERR",
-    //             msg: "Server Error",
-    //             error: err,
-    //         });
-    //     }
-    // },
     createDevice: async (req, res) => {
         try {
             const accessToken = req.headers.authorization.split(" ")[1];
@@ -266,7 +169,7 @@ const deviceController = {
             });
         }
     },
-    
+
     getDevicesListOfHome: async (req, res) => {
         try {
             const accessToken = req.headers.authorization.split(" ")[1];
@@ -346,23 +249,122 @@ const deviceController = {
             });
         }
     },
-    updateData: async (data) => {
+    retrieveData: async () => {
         try {
-            const device = await Device.findByIdAndUpdate(data.deviceId, {
-                    data: data.data,
+            const led = await Device.findById("64d01207cfd9fc49181e18cf");
+            console.log(led);
+            const air_conditioner = await Device.findById(
+                "64d0121bcfd9fc49181e18dd"
+            );
+            const fan = await Device.findById("64d01225cfd9fc49181e18ec");
+            client.publish(
+                topic,
+                JSON.stringify({
+                    deviceId: led._id,
+                    control: led.control,
+                    automatic: led.automatic,
+                }),
+                (err) => {
+                    if (err) console.log("MQTT publish error: ", err);
+                    else console.log("Published!");
+                }
+            );
+            client.publish(
+                topic,
+                JSON.stringify({
+                    deviceId: air_conditioner._id,
+                    control: air_conditioner.control,
+                    automatic: air_conditioner.automatic,
+                }),
+                (err) => {
+                    if (err) console.log("MQTT publish error: ", err);
+                    else console.log("Published!");
+                }
+            );
+            client.publish(
+                topic,
+                JSON.stringify({
+                    deviceId: fan._id,
+                    control: fan.control,
+                    automatic: fan.automatic,
+                }),
+                (err) => {
+                    if (err) console.log("MQTT publish error: ", err);
+                    else console.log("Published!");
+                }
+            );
+        } catch (error) {
+            console.log(error);
+        }
+    },
+    updateData: async (_data) => {
+        try {
+            const { deviceId, data, control, automatic } = _data;
+            const device = await Device.findById(deviceId);
+            await Device.findByIdAndUpdate(deviceId, {
+                data: {
+                    ...device.data,
+                    ...data,
+                },
+                control: {
+                    ...device.control,
+                    ...control,
+                },
+                automatic: {
+                    ...device.automatic,
+                    ...automatic,
+                },
             });
+            if (device.deviceType === "Nhiệt độ, độ ẩm") {
+                pusher.trigger("device", "temperature-humidity", {
+                    deviceData: {
+                        deviceId: device._id,
+                        data: {
+                            ...device.data,
+                            ...data,
+                        },
+                    },
+                });
+            } else if (device.deviceType === "Cảm biến ánh sáng") {
+                pusher.trigger("device", "light-sensor", {
+                    deviceData: {
+                        deviceId: device._id,
+                        data: {
+                            ...device.data,
+                            ...data,
+                        },
+                    },
+                });
+            } else {
+                pusher.trigger("device", "device-data", {
+                    deviceData: {
+                        deviceId: device._id,
+                        data: {
+                            ...device.data,
+                            ...data,
+                        },
+                        control: {
+                            ...device.control,
+                            ...control,
+                        },
+                        automatic: {
+                            ...device.automatic,
+                            ...automatic,
+                        },
+                    },
+                });
+            }
         } catch (err) {
             console.log(err);
         }
     },
     controlDevice: async (req, res) => {
         try {
-            const { deviceId, ...control } = req.body;
+            const { deviceId, control, automatic } = req.body;
 
-            console.log("deviceid: ", deviceId);
-            console.log("control: ", control.control);
             const currentDevice = await Device.findByIdAndUpdate(deviceId, {
-                control: { ...control.control },
+                control: control,
+                automatic: automatic,
             });
             // client.on('connect', () => {
             // console.log('Connected broker')
@@ -370,7 +372,8 @@ const deviceController = {
                 topic,
                 JSON.stringify({
                     deviceId: deviceId,
-                    control: { ...control.control },
+                    control: control,
+                    automatic: automatic,
                 }),
                 (err) => {
                     if (err) console.log("MQTT publish error: ", err);
@@ -392,22 +395,22 @@ const deviceController = {
             });
         }
     },
-    getTemperature: async (req, res) => {
+    getTemperatureAndHumidity: async (req, res) => {
         try {
             const { deviceId } = req.query;
             var data;
             const deviceData = await Device.findById(deviceId);
             console.log(deviceData);
-            if (deviceData.deviceType === "Cảm biến nhiệt độ") {
+            if (deviceData.deviceType === "Nhiệt độ, độ ẩm") {
                 // value = device.value[device.value.length - 1];
                 data = deviceData.data;
             }
-                console.log(data);
-            
+            console.log(data);
+
             res.status(200).json({
                 status: "OK",
-                msg: "Get room temperature success",
-                temperature: data,
+                msg: "Get room temperature and humidity success",
+                data: data,
             });
         } catch (err) {
             res.status(500).json({
@@ -418,31 +421,31 @@ const deviceController = {
         }
     },
 
-    getHumidity: async (req, res) => {
-        try {
-            const { deviceId } = req.query;
-            var data;
-            const deviceData = await Device.findById(deviceId);
-            console.log(deviceData);
-            if (deviceData.deviceType === "Cảm biến độ ẩm") {
-                // value = device.value[device.value.length - 1];
-                data = deviceData.data;
-            }
-                console.log(data);
-            
-            res.status(200).json({
-                status: "OK",
-                msg: "Get room humidity success",
-                humidity: data,
-            });
-        } catch (err) {
-            res.status(500).json({
-                status: "ERR",
-                msg: "Server error",
-                error: err,
-            });
-        }
-    },
+    // getHumidity: async (req, res) => {
+    //     try {
+    //         const { deviceId } = req.query;
+    //         var data;
+    //         const deviceData = await Device.findById(deviceId);
+    //         console.log(deviceData);
+    //         if (deviceData.deviceType === "Cảm biến độ ẩm") {
+    //             // value = device.value[device.value.length - 1];
+    //             data = deviceData.data;
+    //         }
+    //             console.log(data);
+
+    //         res.status(200).json({
+    //             status: "OK",
+    //             msg: "Get room humidity success",
+    //             humidity: data,
+    //         });
+    //     } catch (err) {
+    //         res.status(500).json({
+    //             status: "ERR",
+    //             msg: "Server error",
+    //             error: err,
+    //         });
+    //     }
+    // },
 
     getDevicesListOfAdmin: async (req, res) => {
         try {

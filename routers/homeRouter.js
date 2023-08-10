@@ -2,9 +2,6 @@ const express = require('express')
 const homeController = require('../controllers/homeController')
 const router = express.Router()
 
-// router.get('/:accountId',getHomeData)
-// router.delete('/deleteroom/:homeId/:roomId',deleteRoom)
-
 //create home
 router.post('/api/home/create', homeController.createHome);
 

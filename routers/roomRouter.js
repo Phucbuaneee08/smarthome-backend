@@ -2,12 +2,6 @@ const express = require('express')
 const roomController = require('../controllers/roomController')
 const router = express.Router()
 
-// route.get('/:roomId',getRoomData)
-// route.get('/temperature/:roomId',getTemperature)
-// route.get('/humidity/:roomId',getHumidity)
-// route.post('/',createRoom)
-// route.post('/adddevice',addExitedDevice)
-// route.delete('/:roomId/:deviceId',removeDevice)
 
 //create room
 router.post('/api/room/create', roomController.createRoom);

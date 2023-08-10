@@ -293,53 +293,6 @@ const accountController = {
         }
     },
 
-    requestToResetPassword: async (req, res) => {
-        try {
-            let { email } = req.body;
-
-            let account = await Account.findOne({
-                email: email,
-            });
-
-            if (!account) {
-                return res.send({
-                    result: "failed",
-                    message: "email không hợp lệ",
-                });
-            }
-            var random = 100000 + Math.random() * 900000;
-            var plainResetPasswordToken = Math.floor(random);
-
-            const hashedResetPasswordToken = await utils.sha256(
-                plainResetPasswordToken.toString()
-            );
-
-            await Account.findOneAndUpdate(
-                {
-                    email: email,
-                },
-                {
-                    password: hashedResetPasswordToken,
-                }
-            );
-
-            res.send({
-                result: "success",
-                password: hashedResetPasswordToken,
-            });
-
-            await sendEmail(
-                email,
-                "SHOME: Mật khẩu mới của bạn",
-                plainResetPasswordToken
-            );
-        } catch (error) {
-            res.send({
-                result: "failed",
-                message: error,
-            });
-        }
-    },
     adminSignIn: async (req, res) => {
         try {
             const account = await Account.findOne({

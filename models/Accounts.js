@@ -3,31 +3,6 @@ const Schema = mongoose.Schema;
 
 const accounts = new Schema(
     {
-        // username: {
-        //     type: String,
-        //     required: true
-        // },
-        // password: {
-        //     type: String,
-        //     required: true
-        // },
-        // phone: {
-        //     type: String,
-        //     default: ''
-        // },
-        // fullname: {
-        //     type: String,
-        //     default: ''
-        // },
-        // home: {
-        //     type: mongoose.SchemaTypes.ObjectId,
-        //     default: null,
-        //     ref: 'homes'
-        // },
-        // createAt: {
-        //     type: Date,
-        //     default: Date.now
-        // }
         username: String,
         password: String,
         fullname: String,
@@ -56,9 +31,6 @@ const accounts = new Schema(
                 }
             },
         ],
-        expirationDateToken: Date,
-        resetPasswordToken: String,
-        expirationDateResetPasswordToken: String,
     },
     { timestamps: true }
 );

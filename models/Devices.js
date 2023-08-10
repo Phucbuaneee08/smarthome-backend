@@ -15,27 +15,55 @@ const devices = mongoose.Schema(
             ref: "rooms",
         },
         data: {
-            type: String,
-            default: "",
+            temperature: {
+                type: String,
+                default: "",
+            },
+            humidity: {
+                type: String,
+                default: "",
+            },
+            lightSensor: {
+                type: String,
+                default: "",
+            },
         },
         control: {
             status: {
                 type: Boolean,
                 default: false,
             },
-            // mode: {
-            //     type: String,
-            //     default: "1",
-            // },
-            // direction: {
-            //     type: Number,
-            //     default: 0,
-            // },
-            // speed: {
-            //     type: Number,
-            //     default: 0,
-            // },
             intensity: {
+                type: Number,
+                default: 1000,
+            },
+            lightAuto: {
+                type: Boolean,
+                default: false,
+            },
+            timerAuto: {
+                type: Boolean,
+                default: false,
+            },
+        },
+        automatic: {
+            lightValue: {
+                type: Number,
+                default: 4095,
+            },
+            hourFrom: {
+                type: Number,
+                default: 0,
+            },
+            hourTo: {
+                type: Number,
+                default: 0,
+            },
+            minuteFrom: {
+                type: Number,
+                default: 0,
+            },
+            minuteTo: {
                 type: Number,
                 default: 0,
             },
