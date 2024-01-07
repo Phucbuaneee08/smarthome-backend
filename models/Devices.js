@@ -10,6 +10,10 @@ const devices = mongoose.Schema(
             type: String,
             default: "",
         },
+        deviceChannel: {
+            type: Number,
+            default: 0,
+        },
         roomId: {
             type: mongoose.SchemaTypes.ObjectId,
             ref: "rooms",
@@ -35,7 +39,7 @@ const devices = mongoose.Schema(
             },
             intensity: {
                 type: Number,
-                default: 1000,
+                default: 8000,
             },
             lightAuto: {
                 type: Boolean,

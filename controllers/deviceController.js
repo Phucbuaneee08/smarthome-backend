@@ -1,8 +1,11 @@
 const mqtt = require("mqtt");
-const broker = "mqtt://broker.hivemq.com:1883";
+const broker = "mqtts://5233f9fd02c24818937557bb15993b3f.s2.eu.hivemq.cloud:8883";
 const topic = "/control_device";
 const Device = require("../models/Devices");
-const options = {};
+const options = {
+    username: 'iot-sensor', 
+    password: '27082002' 
+};
 const client = mqtt.connect(broker, options);
 const Room = require("../models/Rooms");
 const Account = require("../models/Accounts");
@@ -249,93 +252,93 @@ const deviceController = {
             });
         }
     },
-    retrieveData: async () => {
-        try {
-            const led = await Device.findById("64d01207cfd9fc49181e18cf");
-            console.log(led);
-            const air_conditioner = await Device.findById(
-                "64d0121bcfd9fc49181e18dd"
-            );
-            const fan = await Device.findById("64d01225cfd9fc49181e18ec");
-            client.publish(
-                topic,
-                JSON.stringify({
-                    deviceId: led._id,
-                    control: led.control,
-                    automatic: led.automatic,
-                }),
-                (err) => {
-                    if (err) console.log("MQTT publish error: ", err);
-                    else console.log("Published!");
-                }
-            );
-            client.publish(
-                topic,
-                JSON.stringify({
-                    deviceId: air_conditioner._id,
-                    control: air_conditioner.control,
-                    automatic: air_conditioner.automatic,
-                }),
-                (err) => {
-                    if (err) console.log("MQTT publish error: ", err);
-                    else console.log("Published!");
-                }
-            );
-            client.publish(
-                topic,
-                JSON.stringify({
-                    deviceId: fan._id,
-                    control: fan.control,
-                    automatic: fan.automatic,
-                }),
-                (err) => {
-                    if (err) console.log("MQTT publish error: ", err);
-                    else console.log("Published!");
-                }
-            );
-        } catch (error) {
-            console.log(error);
-        }
-    },
+    // retrieveData: async () => {
+    //     try {
+    //         const led = await Device.findById("64d01207cfd9fc49181e18cf");
+    //         console.log(led);
+    //         const air_conditioner = await Device.findById(
+    //             "64d0121bcfd9fc49181e18dd"
+    //         );
+    //         const fan = await Device.findById("64d01225cfd9fc49181e18ec");
+    //         client.publish(
+    //             topic,
+    //             JSON.stringify({
+    //                 deviceId: led._id,
+    //                 control: led.control,
+    //                 automatic: led.automatic,
+    //             }),
+    //             (err) => {
+    //                 if (err) console.log("MQTT publish error: ", err);
+    //                 else console.log("Published!");
+    //             }
+    //         );
+    //         client.publish(
+    //             topic,
+    //             JSON.stringify({
+    //                 deviceId: air_conditioner._id,
+    //                 control: air_conditioner.control,
+    //                 automatic: air_conditioner.automatic,
+    //             }),
+    //             (err) => {
+    //                 if (err) console.log("MQTT publish error: ", err);
+    //                 else console.log("Published!");
+    //             }
+    //         );
+    //         client.publish(
+    //             topic,
+    //             JSON.stringify({
+    //                 deviceId: fan._id,
+    //                 control: fan.control,
+    //                 automatic: fan.automatic,
+    //             }),
+    //             (err) => {
+    //                 if (err) console.log("MQTT publish error: ", err);
+    //                 else console.log("Published!");
+    //             }
+    //         );
+    //     } catch (error) {
+    //         console.log(error);
+    //     }
+    // },
     updateData: async (_data) => {
         try {
-            const { deviceId, data, control, automatic } = _data;
-            const device = await Device.findById(deviceId);
-            await Device.findByIdAndUpdate(deviceId, {
-                data: {
-                    ...device.data,
-                    ...data,
-                },
-                control: {
-                    ...device.control,
-                    ...control,
-                },
-                automatic: {
-                    ...device.automatic,
-                    ...automatic,
-                },
-            });
-            if (device.deviceType === "Nhiệt độ, độ ẩm") {
+            const {
+                deviceId,
+                deviceType,
+                deviceChannel,
+                data,
+                control,
+                automatic,
+            } = _data;
+
+            if (deviceType === "dhtSensor") {
                 pusher.trigger("device", "temperature-humidity", {
-                    deviceData: {
-                        deviceId: device._id,
-                        data: {
-                            ...device.data,
-                            ...data,
-                        },
+                    tempData: {
+                        ...data,
                     },
                 });
-            } else if (device.deviceType === "Cảm biến ánh sáng") {
+            } else if (deviceType === "lightSensor") {
                 pusher.trigger("device", "light-sensor", {
-                    deviceData: {
-                        deviceId: device._id,
-                        data: {
-                            ...device.data,
-                            ...data,
-                        },
+                    lightData: {
+                        ...data,
                     },
                 });
             } else {
+                const device = await Device.findById(deviceId);
+                await Device.findByIdAndUpdate(deviceId, {
+                    data: {
+                        ...device.data,
+                        ...data,
+                    },
+                    control: {
+                        ...device.control,
+                        ...control,
+                    },
+                    automatic: {
+                        ...device.automatic,
+                        ...automatic,
+                    },
+                });
                 pusher.trigger("device", "device-data", {
                     deviceData: {
                         deviceId: device._id,
@@ -360,7 +363,7 @@ const deviceController = {
     },
     controlDevice: async (req, res) => {
         try {
-            const { deviceId, control, automatic } = req.body;
+            const { deviceId, deviceChannel, control, automatic } = req.body;
 
             const currentDevice = await Device.findByIdAndUpdate(deviceId, {
                 control: control,
@@ -372,6 +375,7 @@ const deviceController = {
                 topic,
                 JSON.stringify({
                     deviceId: deviceId,
+                    deviceChannel: deviceChannel,
                     control: control,
                     automatic: automatic,
                 }),
